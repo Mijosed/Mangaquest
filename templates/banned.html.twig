@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Banni{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-6 rounded-lg shadow-md text-center">
+        <h1 class="text-3xl font-bold mb-4">Vous êtes banni</h1>
+        <p class="text-lg">Votre compte a été suspendu. Veuillez contacter un administrateur pour plus d'informations.</p>
+        <div class="mt-6">
+            <a href="mailto:admin@restaurant-tp.com" class="text-blue-500 hover:underline">
+                Contactez l'administrateur
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

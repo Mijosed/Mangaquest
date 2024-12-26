@@ -1,0 +1,25 @@
+App\Entity\User:
+
+  user_template (template):
+    email: '<email()>'
+    username: '<userName()>'
+    plainPassword: 'test'
+
+  user_admin (extends user_template):
+    email: 'admin@gmail.com'
+    username: 'Admin Admin'
+    roles: ['ROLE_ADMIN']
+  
+  user_user (extends user_template):
+    email: 'user@gmail.com'
+    username: 'User User'
+    roles: ['ROLE_USER']
+
+  user_banned (extends user_template):
+    email: 'banned@gmail.com'
+    username: 'Banned Banned'
+    roles: ['ROLE_BANNED']
+
+  user {1..5} (extends user_template):
+
+  

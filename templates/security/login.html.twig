@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white shadow-md rounded-lg p-6">
+    <h1 class="text-2xl font-bold text-center text-red-600 mb-6">Connectez-vous</h1>
+
+    {% if error %}
+        <div class="bg-red-100 text-red-800 p-3 rounded mb-4">
+            {{ error.messageKey|trans(error.messageData, 'security') }}
+        </div>
+    {% endif %}
+
+    {% if app.user %}
+        <div class="mb-3 text-center">
+            Vous êtes connecté en tant que <strong>{{ app.user.userIdentifier }}</strong>, 
+            <a href="{{ path('app_logout') }}" class="text-blue-500 hover:underline">Déconnexion</a>
+        </div>
+    {% endif %}
+
+    <form method="post">
+        <!-- Email -->
+        <div class="mb-4">
+            <label for="username" class="block text-gray-700 font-medium">Email</label>
+            <input type="email" value="{{ last_username }}" name="_username" id="username" 
+                   class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-red-300" 
+                   autocomplete="email" required autofocus>
+        </div>
+
+        <!-- Password -->
+        <div class="mb-4">
+            <label for="password" class="block text-gray-700 font-medium">Mot de passe</label>
+            <input type="password" name="_password" id="password" 
+                   class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-red-300" 
+                   autocomplete="current-password" required>
+        </div>
+
+        <!-- CSRF Token -->
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+        <!-- Remember Me (Optional) -->
+        {# Uncomment this block if remember_me is enabled in your firewall
+        <div class="mb-4">
+            <label class="inline-flex items-center">
+                <input type="checkbox" name="_remember_me" id="_remember_me" class="form-checkbox text-red-600">
+                <span class="ml-2 text-gray-700">Se souvenir de moi</span>
+            </label>
+        </div>
+        #}
+
+        <!-- Submit Button -->
+        <div>
+            <button type="submit" 
+                    class="w-full bg-red-600 text-white py-3 px-4 rounded hover:bg-red-700 transition">
+                Se connecter
+            </button>
+        </div>
+    </form>
+
+    <div class="mt-4 text-center">
+        <a href="{{ path('app_forgot_password_request') }}" class="text-blue-500 hover:underline">
+            Mot de passe oublié ?
+        </a>
+    </div>
+</div>
+{% endblock %}

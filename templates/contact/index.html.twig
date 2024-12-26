@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contact{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-red-600 mb-6">Contactez-nous</h1>
+
+    {% for message in app.flashes('success') %}
+        <div class="bg-green-100 text-green-700 p-4 rounded mb-6">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200">
+        {{ form_start(form) }}
+
+        <div class="mb-4">
+            {{ form_label(form.name, 'Nom', {'label_attr': {'class': 'font-medium text-gray-700'}}) }}
+            {{ form_widget(form.name, {'attr': {'class': 'w-full p-3 border border-gray-300 rounded'}}) }}
+            {{ form_errors(form.name) }}
+        </div>
+
+        <div class="mb-4">
+            {{ form_label(form.email, 'Email', {'label_attr': {'class': 'font-medium text-gray-700'}}) }}
+            {{ form_widget(form.email, {'attr': {'class': 'w-full p-3 border border-gray-300 rounded'}}) }}
+            {{ form_errors(form.email) }}
+        </div>
+
+        <div class="mb-4">
+            {{ form_label(form.message, 'Message', {'label_attr': {'class': 'font-medium text-gray-700'}}) }}
+            {{ form_widget(form.message, {'attr': {'class': 'w-full p-3 border border-gray-300 rounded'}}) }}
+            {{ form_errors(form.message) }}
+        </div>
+
+        <button class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+            Envoyer
+        </button>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

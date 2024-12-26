@@ -1,0 +1,36 @@
+<nav class="bg-yellow-500 text-white shadow-md">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <!-- Logo -->
+        <a href="{{path('app_home')}}" class="text-2xl font-bold hover:text-gray-100">
+            <img src="/images/logoNavbar.svg" alt="Mangaquest Logo" class="h-12">
+        </a>
+
+        <!-- Navigation Links -->
+        <ul class="flex space-x-8 text-lg font-medium">
+            {% if is_granted('ROLE_USER') %}
+            <li><a href="#" class="hover:text-yellow-300">Manga</a></li>
+            <li><a href="#" class="hover:text-yellow-300">Anime</a></li>
+            <li><a href="#" class="hover:text-yellow-300">Communauté</a></li>
+            {% endif %}
+
+            <!-- Admin Link -->
+            {% if is_granted('ROLE_ADMIN') %}
+                <li><a href="{{path('admin_dashboard')}}" class="hover:text-yellow-300">Admin</a></li>
+            {% endif %}
+        </ul>
+
+        <!-- Authentication Links -->
+        <div class="flex items-center space-x-4">
+            {% if app.user %}
+                <!-- User Info -->
+                <span>Bienvenue, <strong>{{ app.user.username }}</strong></span>
+                <a href="{{ path('app_user_profile') }}" class="hover:text-yellow-300">Profil</a>
+                <a href="{{ path('app_logout') }}" class="hover:text-yellow-300">Logout</a>
+            {% else %}
+                <!-- Login/Register Links -->
+                <a href="{{ path('app_login') }}" class="hover:text-yellow-300">Login</a>
+                <a href="{{ path('app_register') }}" class="hover:text-yellow-300">Register</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>

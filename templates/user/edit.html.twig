@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier l'Utilisateur{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Titre -->
+    <h1 class="text-2xl font-bold text-red-600 mb-6 text-center">Modifier l'Utilisateur</h1>
+
+    <!-- Formulaire -->
+    <div class="bg-white shadow-md rounded-lg p-6 border border-gray-200">
+        <form method="post">
+            {% for field in form %}
+                <div class="mb-4">
+                    {{ form_label(field, null, {'label_attr': {'class': 'block text-gray-700 font-medium mb-2'}}) }}
+                    {{ form_widget(field, {'attr': {'class': 'w-full px-4 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500'}}) }}
+                    {{ form_errors(field) }}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition">
+                Mettre à jour
+            </button>
+        </form>
+    </div>
+
+    <!-- Liens supplémentaires -->
+    <div class="mt-6 flex justify-between items-center">
+        <!-- Retour -->
+        <a href="{{ path('app_user_index') }}" class="text-blue-600 hover:text-blue-800 font-semibold">
+            ← Retour à la liste
+        </a>
+
+        <!-- Suppression -->
+        <div>
+            {{ include('user/_delete_form.html.twig') }}
+        </div>
+    </div>
+</div>
+{% endblock %}

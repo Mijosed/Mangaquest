@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white shadow-md rounded-lg p-6">
+    <!-- Flash messages for errors -->
+    {% for flash_error in app.flashes('verify_email_error') %}
+        <div class="bg-red-100 text-red-800 p-3 rounded mb-4">
+            {{ flash_error }}
+        </div>
+    {% endfor %}
+
+    <!-- Form Title -->
+    <h1 class="text-2xl font-bold text-center text-red-600 mb-6">Créer un compte</h1>
+
+    <!-- Display errors -->
+    {% if form_errors(registrationForm) %}
+        <div class="bg-red-100 text-red-800 p-3 rounded mb-4">
+            {{ form_errors(registrationForm) }}
+        </div>
+    {% endif %}
+
+    <!-- Registration Form -->
+    {{ form_start(registrationForm, {'attr': {'class': 'space-y-4'}}) }}
+
+        <!-- Email Field -->
+        <div>
+            {{ form_row(registrationForm.email, {
+                'attr': {'class': 'w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-red-300'},
+                'label_attr': {'class': 'block text-gray-700 font-medium'}
+            }) }}
+        </div>
+
+        <!-- Username Field -->
+        <div>
+            {{ form_row(registrationForm.username, {
+                'attr': {'class': 'w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-red-300'},
+                'label_attr': {'class': 'block text-gray-700 font-medium'}
+            }) }}
+        </div>
+
+        <!-- Password Field -->
+        <div>
+            {{ form_row(registrationForm.plainPassword, {
+                'attr': {'class': 'w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-red-300'},
+                'label_attr': {'class': 'block text-gray-700 font-medium'},
+                'label': 'Mot de passe'
+            }) }}
+        </div>
+
+        <!-- Agree Terms -->
+        <div>
+            {{ form_row(registrationForm.agreeTerms, {
+                'attr': {'class': 'form-checkbox text-red-600'},
+                'label_attr': {'class': 'inline-flex items-center text-gray-700'}
+            }) }}
+        </div>
+
+        <!-- Submit Button -->
+        <div>
+            <button type="submit"
+                    class="w-full bg-red-600 text-white py-3 px-4 rounded hover:bg-red-700 transition">
+                S'inscrire
+            </button>
+        </div>
+    {{ form_end(registrationForm) }}
+</div>
+{% endblock %}

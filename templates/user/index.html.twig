@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Utilisateurs{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold text-red-600 mb-6">Liste des Utilisateurs</h1>
+    <table class="w-full border border-gray-300 text-left">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="py-2 px-4 border">Id</th>
+                <th class="py-2 px-4 border">Nom d'Utilisateur</th>
+                <th class="py-2 px-4 border">Email</th>
+                <th class="py-2 px-4 border">Rôles</th>
+                <th class="py-2 px-4 border">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td class="py-2 px-4 border">{{ user.id }}</td>
+                <td class="py-2 px-4 border">{{ user.username }}</td>
+                <td class="py-2 px-4 border">{{ user.email }}</td>
+                <td class="py-2 px-4 border">{{ user.roles ? user.roles|json_encode : '' }}</td>
+                <td class="py-2 px-4 border">
+                    <a href="{{ path('app_user_show', {'id': user.id}) }}" class="text-blue-500 hover:underline">Afficher</a>
+                    <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="text-green-500 hover:underline">Modifier</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5" class="py-2 px-4 border text-center text-gray-500">Aucun enregistrement trouvé</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="mt-6">
+        <a href="{{ path('app_user_new') }}" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Créer un nouveau</a>
+    </div>
+</div>
+{% endblock %}
