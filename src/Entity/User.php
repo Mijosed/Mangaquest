@@ -38,6 +38,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $resetPasswordToken = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $avatar = null;
+
     public function __construct()
     {
         $this->roles = ['ROLE_USER'];
@@ -124,6 +127,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setResetPasswordToken(?string $resetPasswordToken): static
     {
         $this->resetPasswordToken = $resetPasswordToken;
+
+        return $this;
+    }
+
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(string $avatar): static
+    {
+        $this->avatar = $avatar;
 
         return $this;
     }
