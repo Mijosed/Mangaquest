@@ -4,6 +4,9 @@ App\Entity\User:
     email: '<email()>'
     username: '<userName()>'
     plainPassword: 'test'
+    avatar: '<imageUrl(400, 400, "people")>'
+
+  
 
   user_admin (extends user_template):
     email: 'admin@gmail.com'
