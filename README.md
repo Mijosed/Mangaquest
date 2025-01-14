@@ -16,4 +16,4 @@
     - Utilisez cette extension pour visualiser les données dans `var/data.db`.
 
 4. **Se connecter :**
-    - Les identifiants de connexion se trouvent dans `fixtures/user.yaml`.
+    - Les identifiants de connexion se trouvent dans `fixtures/user.yaml`. 
