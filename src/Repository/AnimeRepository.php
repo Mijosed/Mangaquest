@@ -40,4 +40,23 @@ class AnimeRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function searchByTitle(string $query): array
+    {
+        return $this->createQueryBuilder('a')
+            ->where('LOWER(a.title) LIKE LOWER(:query)')
+            ->setParameter('query', '%' . $query . '%')
+            ->orderBy('a.title', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByTitles(array $titles): array
+    {
+        return $this->createQueryBuilder('a')
+            ->where('a.title IN (:titles)')
+            ->setParameter('titles', $titles)
+            ->getQuery()
+            ->getResult();
+    }
 }

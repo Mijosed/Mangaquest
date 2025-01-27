@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Catalogue Anime{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold mb-8">Catalogue Anime</h1>
+        
+        {# Barre de recherche #}
+        <div class="mb-8">
+            <form method="get" class="flex gap-4">
+                <input type="text" 
+                       name="search" 
+                       value="{{ searchQuery }}" 
+                       placeholder="Rechercher un anime..."
+                       class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button type="submit" 
+                        class="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+                    Rechercher
+                </button>
+            </form>
+        </div>
+
+        {# Affichage des résultats #}
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {% if animes|length > 0 %}
+                {% for anime in animes %}
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <a href="{{ path('app_anime_show', {'id': anime.id}) }}" class="block">
+                        <img src="{{ anime.posterImage }}" 
+                             alt="{{ anime.title }}" 
+                             class="w-full h-64 object-cover">
+                        <div class="p-4">
+                            <h2 class="text-xl font-semibold mb-2">{{ anime.title }}</h2>
+                            <p class="text-gray-600 text-sm">{{ anime.genre }}</p>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-span-full text-center py-8 text-gray-500">
+                    Aucun anime trouvé pour "{{ searchQuery }}"
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
