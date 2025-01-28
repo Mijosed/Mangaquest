@@ -11,9 +11,10 @@
     ```bash
     symfony serve
     ```
-
-3. **Installer l'extension SQL Viewer :**
-    - Utilisez cette extension pour visualiser les données dans `var/data.db`.
-
-4. **Se connecter :**
-    - Les identifiants de connexion se trouvent dans `fixtures/user.yaml`. 
+3. **Se connecter :**
+    - Les identifiants de connexion se trouvent dans `fixtures/user.yaml`.
+      
+4. **Charger les animes :**
+   ```bash
+    php bin/console app:fetch-anime
+   ```
