@@ -9,7 +9,7 @@
         <ul class="flex space-x-8 text-lg font-medium">
             {% if is_granted('ROLE_USER') %}
             <li><a href="#" class="hover:text-yellow-300">Manga</a></li>
-            <li><a href="#" class="hover:text-yellow-300">Anime</a></li>
+            <li><a href="{{path('app_anime_index')}}" class="hover:text-yellow-300">Anime</a></li>
             <li><a href="#" class="hover:text-yellow-300">Communauté</a></li>
             {% endif %}
 
