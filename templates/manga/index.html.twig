@@ -6,21 +6,46 @@
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-3xl font-bold mb-8">Catalogue Manga</h1>
         
-        
-        
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {% for manga in mangas %}
                 <div class="manga-card">
                     <a href="{{ path('app_manga_show', {mangaDexId: manga.mangaDexId}) }}" class="block">
                         {% if manga.coverImage %}
-                            <img src="{{ asset('proxy.php?url=https://uploads.mangadex.org/covers/' ~ manga.mangaDexId ~ '/' ~ manga.coverImage) }}"
+                            <img src="https://uploads.mangadex.org/covers/{{ manga.mangaDexId }}/{{ manga.coverImage }}"
                                  alt="{{ manga.title }}"
-                                 class="w-full h-64 object-cover rounded-lg shadow-lg">
+                                 class="w-full h-64 object-cover rounded-lg shadow-lg"
+                                 referrerpolicy="no-referrer">
                         {% endif %}
                         <h2 class="mt-2 text-lg font-semibold">{{ manga.title }}</h2>
                     </a>
                 </div>
             {% endfor %}
         </div>
+
+        {# Pagination #}
+        {% if maxPages > 1 %}
+            <div class="mt-8 flex justify-center gap-2">
+                {% if currentPage > 1 %}
+                    <a href="{{ path('app_manga_list', {page: currentPage - 1}) }}" 
+                       class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        Précédent
+                    </a>
+                {% endif %}
+
+                {% for i in max(1, currentPage - 2)..min(maxPages, currentPage + 2) %}
+                    <a href="{{ path('app_manga_list', {page: i}) }}" 
+                       class="px-4 py-2 {% if currentPage == i %}bg-blue-600{% else %}bg-blue-500{% endif %} text-white rounded hover:bg-blue-600">
+                        {{ i }}
+                    </a>
+                {% endfor %}
+
+                {% if currentPage < maxPages %}
+                    <a href="{{ path('app_manga_list', {page: currentPage + 1}) }}" 
+                       class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        Suivant
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
     </div>
 {% endblock %}

@@ -40,4 +40,15 @@ class MangaRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function findByPage(int $page = 1, int $limit = 24): array
+    {
+        $offset = ($page - 1) * $limit;
+
+        return $this->createQueryBuilder('m')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -12,25 +12,38 @@ class MangaDexApiService
         private readonly HttpClientInterface $httpClient
     ) {}
 
-    public function getMangaList(int $limit = 50): array
+    public function getMangaList(int $page = 1, int $limit = 24): array
     {
+        $offset = ($page - 1) * $limit;
+        
         $response = $this->httpClient->request('GET', self::API_BASE_URL . '/manga', [
             'query' => [
                 'limit' => $limit,
+                'offset' => $offset,
                 'includes[]' => 'cover_art',
                 'contentRating[]' => 'safe',
                 'availableTranslatedLanguage[]' => 'en',
                 'hasAvailableChapters' => true,
-                'order[followedCount]' => 'desc',
-                'offset' => 0
+                'order[followedCount]' => 'desc'
             ],
             'headers' => [
-                'Accept' => 'application/json',
-                'Referer' => 'https://mangadex.org'
+                'Accept' => 'application/json'
             ]
         ]);
 
-        return $response->toArray()['data'];
+        $data = $response->toArray();
+        
+        // Vérification de la structure des données
+        if (!isset($data['data']) || !is_array($data['data'])) {
+            throw new \RuntimeException('Format de données invalide reçu de l\'API: ' . json_encode($data));
+        }
+
+        return [
+            'data' => $data['data'],
+            'total' => $data['total'] ?? 0,
+            'limit' => $data['limit'] ?? $limit,
+            'offset' => $data['offset'] ?? $offset
+        ];
     }
 
     public function getMangaDetails(string $mangaId): array
@@ -41,8 +54,7 @@ class MangaDexApiService
                 'contentRating[]' => 'safe'
             ],
             'headers' => [
-                'Accept' => 'application/json',
-                'Referer' => 'https://mangadex.org'
+                'Accept' => 'application/json'
             ]
         ]);
 

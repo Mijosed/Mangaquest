@@ -31,22 +31,56 @@ class ImportMangaCommand extends Command
         $io->info('Début de l\'importation des mangas...');
         
         try {
-            $mangas = $this->mangaDexApi->getMangaList();
+            $result = $this->mangaDexApi->getMangaList();
+            $mangas = $result['data'];
+            
+            // Debug pour voir la structure des données
+            $io->info('Structure des données reçues : ' . json_encode(array_slice($mangas, 0, 1), JSON_PRETTY_PRINT));
             
             foreach ($mangas as $mangaData) {
+                if (!isset($mangaData['id'])) {
+                    $io->warning('Manga sans ID trouvé : ' . json_encode($mangaData));
+                    continue;
+                }
+
                 $manga = new Manga();
                 $manga->setMangaDexId($mangaData['id']);
-                $manga->setTitle($mangaData['attributes']['title']['en'] ?? array_values($mangaData['attributes']['title'])[0]);
-                $manga->setDescription($mangaData['attributes']['description']['en'] ?? null);
+                
+                if (!isset($mangaData['attributes']['title'])) {
+                    $io->warning('Manga sans titre trouvé : ' . json_encode($mangaData));
+                    continue;
+                }
+
+                // Gestion du titre avec vérification
+                $title = $mangaData['attributes']['title']['en'] 
+                    ?? array_values($mangaData['attributes']['title'])[0] 
+                    ?? 'Titre inconnu';
+                $manga->setTitle($title);
+                
+                // Gestion de la description avec vérification
+                $description = isset($mangaData['attributes']['description']) 
+                    ? ($mangaData['attributes']['description']['en'] 
+                        ?? array_values($mangaData['attributes']['description'])[0] 
+                        ?? null)
+                    : null;
+                $manga->setDescription($description);
+                
                 $manga->setStatus($mangaData['attributes']['status'] ?? null);
                 $manga->setYear($mangaData['attributes']['year'] ?? null);
 
-                // Gestion de la cover
-                $coverFile = array_filter($mangaData['relationships'], fn($rel) => $rel['type'] === 'cover_art');
-                if (!empty($coverFile)) {
-                    $coverFile = reset($coverFile);
-                    $manga->setCoverImage($coverFile['attributes']['fileName'] ?? null);
+                // Gestion de la cover avec vérification
+                $coverFile = null;
+                if (isset($mangaData['relationships']) && is_array($mangaData['relationships'])) {
+                    foreach ($mangaData['relationships'] as $relationship) {
+                        if (isset($relationship['type']) 
+                            && $relationship['type'] === 'cover_art' 
+                            && isset($relationship['attributes']['fileName'])) {
+                            $coverFile = $relationship['attributes']['fileName'];
+                            break;
+                        }
+                    }
                 }
+                $manga->setCoverImage($coverFile);
 
                 $this->entityManager->persist($manga);
             }
@@ -58,6 +92,7 @@ class ImportMangaCommand extends Command
             return Command::SUCCESS;
         } catch (\Exception $e) {
             $io->error('Erreur lors de l\'importation : ' . $e->getMessage());
+            $io->error('Trace : ' . $e->getTraceAsString());
             
             return Command::FAILURE;
         }
