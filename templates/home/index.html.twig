@@ -1,14 +1,89 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil{% endblock %}
+{% block title %}Accueil - MangaQuest{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <div class="bg-gray-100 p-8 rounded-lg shadow-md text-center">
-        <h1 class="text-4xl font-bold text-red-600 mb-4">Bienvenue sur notre site !</h1>
-        <p class="text-lg text-gray-700">
-            Vous êtes sur la page d'accueil.
-        </p>
+{# Hero Section #}
+<div class="relative pt-16">
+    <div class="absolute inset-0 z-0 h-[600px]">
+        <img src="{{ asset('images/background.jpg') }}"
+             alt="Background"
+             class="w-full h-full object-cover object-center brightness-50"
+        >
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
+        <div class="text-center">
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+                Explorez l'univers des <span class="text-yellow-400">Mangas</span> et <span class="text-yellow-400">Animes</span>
+            </h1>
+            <p class="text-xl text-gray-200 mb-8 max-w-3xl mx-auto">
+                Découvrez, suivez et partagez vos séries préférées sur la plateforme dédiée aux passionnés
+            </p>
+            <div class="flex justify-center gap-4">
+                <a href="{{ path('app_manga_list') }}" 
+                   class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-8 py-3 rounded-lg font-semibold transition-colors">
+                    Explorer les Mangas
+                </a>
+                <a href="{{ path('app_anime_index') }}" 
+                   class="bg-gray-800 hover:bg-gray-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+                    Voir les Animes
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Features Section #}
+<div class="bg-gray-100 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Pourquoi choisir MangaQuest ?</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto">Une plateforme complète pour tous les amateurs de culture japonaise</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-white rounded-xl shadow-lg p-6 transform hover:-translate-y-1 transition-transform">
+                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Large Collection</h3>
+                <p class="text-gray-600">Accédez à une vaste bibliothèque de mangas et d'animes constamment mise à jour.</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 transform hover:-translate-y-1 transition-transform">
+                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Notifications</h3>
+                <p class="text-gray-600">Restez informé des dernières sorties et mises à jour de vos séries préférées.</p>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6 transform hover:-translate-y-1 transition-transform">
+                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Communauté</h3>
+                <p class="text-gray-600">Rejoignez une communauté passionnée et partagez vos découvertes.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# CTA Section #}
+<div class="bg-gray-900 py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl font-bold text-white mb-8">Prêt à commencer l'aventure ?</h2>
+        <a href="{{ path('app_register') }}" 
+           class="inline-block bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-8 py-3 rounded-lg font-semibold transition-colors">
+            Créer un compte gratuitement
+        </a>
     </div>
 </div>
 {% endblock %}

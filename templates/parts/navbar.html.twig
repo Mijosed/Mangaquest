@@ -1,36 +1,51 @@
-<nav class="bg-yellow-500 text-white shadow-md">
-    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-        <!-- Logo -->
-        <a href="{{path('app_home')}}" class="text-2xl font-bold hover:text-gray-100">
-            <img src="/images/logoNavbar.svg" alt="Mangaquest Logo" class="h-12">
-        </a>
-
-        <!-- Navigation Links -->
-        <ul class="flex space-x-8 text-lg font-medium">
-            {% if is_granted('ROLE_USER') %}
-            <li><a href="{{path('app_manga_list')}}" class="hover:text-yellow-300">Manga</a></li>
-            <li><a href="{{path('app_anime_index')}}" class="hover:text-yellow-300">Anime</a></li>
-            <li><a href="#" class="hover:text-yellow-300">Communauté</a></li>
-            {% endif %}
-
-            <!-- Admin Link -->
-            {% if is_granted('ROLE_ADMIN') %}
-                <li><a href="{{path('admin_dashboard')}}" class="hover:text-yellow-300">Admin</a></li>
-            {% endif %}
-        </ul>
-
-        <!-- Authentication Links -->
-        <div class="flex items-center space-x-4">
-            {% if app.user %}
-                <!-- User Info -->
-                <span>Bienvenue, <strong>{{ app.user.username }}</strong></span>
-                <a href="{{ path('app_user_profile') }}" class="hover:text-yellow-300">Profil</a>
-                <a href="{{ path('app_logout') }}" class="hover:text-yellow-300">Logout</a>
-            {% else %}
-                <!-- Login/Register Links -->
-                <a href="{{ path('app_login') }}" class="hover:text-yellow-300">Login</a>
-                <a href="{{ path('app_register') }}" class="hover:text-yellow-300">Register</a>
-            {% endif %}
+<nav class="bg-yellow-500 fixed w-full z-50 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <a href="{{ path('app_home') }}" class="flex items-center">
+                        <img class="h-12" src="{{ asset('images/logoNavbar.svg') }}" alt="MangaQuest Logo">
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="{{ path('app_manga_list') }}" 
+                           class="text-gray-900 hover:bg-yellow-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            Mangas
+                        </a>
+                        <a href="{{ path('app_anime_index') }}" 
+                           class="text-gray-900 hover:bg-yellow-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            Animes
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="hidden md:block">
+                <div class="ml-4 flex items-center md:ml-6">
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <a href="{{ path('admin') }}" 
+                           class="text-gray-900 hover:bg-yellow-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            Admin
+                        </a>
+                    {% endif %}
+                    {% if app.user %}
+                        <span class="text-gray-900 px-3 py-2 text-sm font-medium">{{ app.user.email }}</span>
+                        <a href="{{ path('app_logout') }}" 
+                           class="text-gray-900 hover:bg-yellow-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            Déconnexion
+                        </a>
+                    {% else %}
+                        <a href="{{ path('app_login') }}" 
+                           class="text-gray-900 hover:bg-yellow-600 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                            Connexion
+                        </a>
+                        <a href="{{ path('app_register') }}" 
+                           class="bg-gray-900 text-white hover:bg-gray-800 px-4 py-2 rounded-md text-sm font-medium transition-colors ml-2">
+                            Inscription
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </nav>
