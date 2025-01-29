@@ -1,0 +1,13 @@
+/*!**************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[1].oneOf[1].use[1]!./assets/styles/app.css ***!
+  \**************************************************************************************************************/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    background-color: skyblue;
+}
+
+
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYXBwLmNzcyIsIm1hcHBpbmdzIjoiOzs7QUFBQSxjQUFjO0FBQ2Qsb0JBQW9CO0FBQ3BCLG1CQUFtQjs7QUFFbkI7SUFDSSx5QkFBeUI7QUFDN0IiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9tYW5nYXF1ZXN0Ly4vYXNzZXRzL3N0eWxlcy9hcHAuY3NzIl0sInNvdXJjZXNDb250ZW50IjpbIkB0YWlsd2luZCBiYXNlO1xuQHRhaWx3aW5kIGNvbXBvbmVudHM7XG5AdGFpbHdpbmQgdXRpbGl0aWVzO1xuXG5ib2R5IHtcbiAgICBiYWNrZ3JvdW5kLWNvbG9yOiBza3libHVlO1xufVxuIl0sIm5hbWVzIjpbXSwic291cmNlUm9vdCI6IiJ9*/
