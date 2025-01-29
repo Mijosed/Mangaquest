@@ -15,26 +15,37 @@ class Manga
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    private ?string $mangaDexId = null;
+
+    #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $author = null;
-
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $publicationDate = null;
-
-    #[ORM\Column(length: 255)]
-    private ?string $genre = null;
-
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $coverImage = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $status = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $year = null;
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getMangaDexId(): ?string
+    {
+        return $this->mangaDexId;
+    }
+
+    public function setMangaDexId(string $mangaDexId): static
+    {
+        $this->mangaDexId = $mangaDexId;
+        return $this;
     }
 
     public function getTitle(): ?string
@@ -45,7 +56,6 @@ class Manga
     public function setTitle(string $title): static
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -54,46 +64,9 @@ class Manga
         return $this->description;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
-
-        return $this;
-    }
-
-    public function getAuthor(): ?string
-    {
-        return $this->author;
-    }
-
-    public function setAuthor(string $author): static
-    {
-        $this->author = $author;
-
-        return $this;
-    }
-
-    public function getPublicationDate(): ?\DateTimeInterface
-    {
-        return $this->publicationDate;
-    }
-
-    public function setPublicationDate(\DateTimeInterface $publicationDate): static
-    {
-        $this->publicationDate = $publicationDate;
-
-        return $this;
-    }
-
-    public function getGenre(): ?string
-    {
-        return $this->genre;
-    }
-
-    public function setGenre(string $genre): static
-    {
-        $this->genre = $genre;
-
         return $this;
     }
 
@@ -102,10 +75,31 @@ class Manga
         return $this->coverImage;
     }
 
-    public function setCoverImage(string $coverImage): static
+    public function setCoverImage(?string $coverImage): static
     {
         $this->coverImage = $coverImage;
+        return $this;
+    }
 
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?string $status): static
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    public function getYear(): ?int
+    {
+        return $this->year;
+    }
+
+    public function setYear(?int $year): static
+    {
+        $this->year = $year;
         return $this;
     }
 }
