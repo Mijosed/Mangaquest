@@ -29,8 +29,8 @@ class Anime
     #[ORM\Column(length: 255)]
     private ?string $genre = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $releaseDate = null;
+    #[ORM\Column(length: 255)]
+    private ?string $releaseDate = null;
 
     #[ORM\Column(length: 255)]
     private ?string $posterImage = null;
@@ -48,7 +48,6 @@ class Anime
     public function setTitle(string $title): static
     {
         $this->title = $title;
-
         return $this;
     }
 
@@ -60,7 +59,6 @@ class Anime
     public function setDescription(string $description): static
     {
         $this->description = $description;
-
         return $this;
     }
 
@@ -72,7 +70,6 @@ class Anime
     public function setStudio(string $studio): static
     {
         $this->studio = $studio;
-
         return $this;
     }
 
@@ -84,7 +81,6 @@ class Anime
     public function setEpisodes(int $episodes): static
     {
         $this->episodes = $episodes;
-
         return $this;
     }
 
@@ -96,19 +92,17 @@ class Anime
     public function setGenre(string $genre): static
     {
         $this->genre = $genre;
-
         return $this;
     }
 
-    public function getReleaseDate(): ?\DateTimeInterface
+    public function getReleaseDate(): ?string
     {
         return $this->releaseDate;
     }
 
-    public function setReleaseDate(\DateTimeInterface $releaseDate): static
+    public function setReleaseDate(string $releaseDate): static
     {
         $this->releaseDate = $releaseDate;
-
         return $this;
     }
 
@@ -120,7 +114,6 @@ class Anime
     public function setPosterImage(string $posterImage): static
     {
         $this->posterImage = $posterImage;
-
         return $this;
     }
 }
