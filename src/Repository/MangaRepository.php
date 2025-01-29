@@ -93,4 +93,20 @@ class MangaRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getSingleScalarResult();
     }
+
+    public function countByStatus(): array
+    {
+        $qb = $this->createQueryBuilder('m')
+            ->select('m.status, COUNT(m.id) as count')
+            ->groupBy('m.status');
+
+        $results = $qb->getQuery()->getResult();
+        
+        $counts = [];
+        foreach ($results as $result) {
+            $counts[$result['status']] = $result['count'];
+        }
+        
+        return $counts;
+    }
 }

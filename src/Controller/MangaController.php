@@ -57,10 +57,29 @@ class MangaController extends AbstractController
         }
 
         $mangaDetails = $this->mangaDexApi->getMangaDetails($mangaDexId);
+        $chapters = $this->mangaDexApi->getMangaChapters($mangaDexId);
 
         return $this->render('manga/show.html.twig', [
             'manga' => $mangaDetails,
-            'localManga' => $localManga
+            'localManga' => $localManga,
+            'chapters' => $chapters
+        ]);
+    }
+
+    #[Route('/manga/{mangaDexId}/chapter/{chapterId}', name: 'app_manga_chapter')]
+    public function chapter(string $mangaDexId, string $chapterId): Response
+    {
+        $localManga = $this->mangaRepository->findOneBy(['mangaDexId' => $mangaDexId]);
+        
+        if (!$localManga) {
+            throw $this->createNotFoundException('Manga non trouvé');
+        }
+
+        $chapterPages = $this->mangaDexApi->getChapterPages($chapterId);
+
+        return $this->render('manga/chapter.html.twig', [
+            'manga' => $localManga,
+            'pages' => $chapterPages
         ]);
     }
 }

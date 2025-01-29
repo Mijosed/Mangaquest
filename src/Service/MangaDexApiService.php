@@ -60,4 +60,51 @@ class MangaDexApiService
 
         return $response->toArray()['data'];
     }
+
+    public function getMangaChapters(string $mangaId): array
+    {
+        $response = $this->httpClient->request('GET', self::API_BASE_URL . "/manga/{$mangaId}/feed", [
+            'query' => [
+                'translatedLanguage[]' => 'en',
+                'order[chapter]' => 'desc',
+                'includes[]' => 'scanlation_group',
+                'limit' => 100,
+                'contentRating[]' => 'safe',
+                'offset' => 0
+            ],
+            'headers' => [
+                'Accept' => 'application/json'
+            ]
+        ]);
+
+        $data = $response->toArray();
+        
+        if (!isset($data['data']) || !is_array($data['data'])) {
+            throw new \RuntimeException('Format de données invalide reçu de l\'API');
+        }
+
+        return $data['data'];
+    }
+
+    public function getChapterPages(string $chapterId): array
+    {
+        $response = $this->httpClient->request('GET', self::API_BASE_URL . "/at-home/server/{$chapterId}", [
+            'headers' => [
+                'Accept' => 'application/json'
+            ]
+        ]);
+
+        $data = $response->toArray();
+        
+        if (!isset($data['baseUrl']) || !isset($data['chapter'])) {
+            throw new \RuntimeException('Format de données invalide reçu de l\'API');
+        }
+
+        return [
+            'baseUrl' => $data['baseUrl'],
+            'hash' => $data['chapter']['hash'],
+            'data' => $data['chapter']['data'],
+            'dataSaver' => $data['chapter']['dataSaver']
+        ];
+    }
 } 

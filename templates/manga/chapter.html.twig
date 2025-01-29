@@ -1,0 +1,176 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ manga.title }} - Chapitre{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-900">
+    {# Barre de contrôle de lecture #}
+    <div class="sticky top-0 bg-gray-800 shadow-lg z-40">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="{{ path('app_manga_show', {mangaDexId: manga.mangaDexId}) }}" 
+                       class="flex items-center text-white hover:text-blue-400 transition-colors">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Retour au manga
+                    </a>
+                    <h1 class="text-white font-medium hidden md:block">{{ manga.title }}</h1>
+                </div>
+
+                {# Contrôles de lecture #}
+                <div class="flex items-center space-x-4">
+                    <button id="toggleReaderMode" class="text-white hover:text-blue-400 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M4 6h16M4 12h16m-7 6h7"/>
+                        </svg>
+                    </button>
+                    <span class="text-white text-sm">
+                        Page <span id="currentPage">1</span>/<span id="totalPages">{{ pages.data|length }}</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Contenu du chapitre #}
+    <div class="container mx-auto px-4 py-8" id="readerContainer">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex flex-col items-center gap-8" id="pageContainer">
+                {% for page in pages.data %}
+                    <div class="relative w-full page-item" data-page="{{ loop.index }}">
+                        <img src="{{ pages.baseUrl }}/data/{{ pages.hash }}/{{ page }}"
+                             alt="Page {{ loop.index }}"
+                             class="w-full h-auto rounded-lg shadow-xl"
+                             loading="{{ loop.index < 3 ? 'eager' : 'lazy' }}"
+                             referrerpolicy="no-referrer">
+                        <div class="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
+                            {{ loop.index }}/{{ pages.data|length }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {# Navigation flottante #}
+    <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-4 bg-gray-800 rounded-full px-6 py-3 shadow-lg z-40">
+        <button id="prevPage" class="text-white hover:text-blue-400 transition-colors disabled:opacity-50">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+        </button>
+        <input type="number" id="pageInput" min="1" max="{{ pages.data|length }}" value="1"
+               class="w-16 bg-gray-700 text-white rounded px-2 py-1 text-center">
+        <button id="nextPage" class="text-white hover:text-blue-400 transition-colors disabled:opacity-50">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+        </button>
+    </div>
+
+    {# Bouton de retour en haut #}
+    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+            class="fixed bottom-4 right-4 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+        </svg>
+    </button>
+</div>
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('pageContainer');
+    const pageInput = document.getElementById('pageInput');
+    const currentPageSpan = document.getElementById('currentPage');
+    const totalPages = {{ pages.data|length }};
+    const prevButton = document.getElementById('prevPage');
+    const nextButton = document.getElementById('nextPage');
+    let currentMode = 'vertical'; // ou 'single'
+    
+    // Mode de lecture
+    document.getElementById('toggleReaderMode').addEventListener('click', function() {
+        if (currentMode === 'vertical') {
+            currentMode = 'single';
+            container.classList.remove('flex', 'flex-col');
+            container.classList.add('hidden');
+            showSinglePage(parseInt(pageInput.value));
+        } else {
+            currentMode = 'vertical';
+            container.classList.remove('hidden');
+            container.classList.add('flex', 'flex-col');
+            document.querySelectorAll('.page-item').forEach(page => {
+                page.style.display = 'block';
+            });
+        }
+    });
+
+    // Navigation par page
+    function showSinglePage(pageNum) {
+        document.querySelectorAll('.page-item').forEach(page => {
+            page.style.display = 'none';
+        });
+        document.querySelector(`[data-page="${pageNum}"]`).style.display = 'block';
+        pageInput.value = pageNum;
+        currentPageSpan.textContent = pageNum;
+        updateNavigationButtons(pageNum);
+    }
+
+    function updateNavigationButtons(pageNum) {
+        prevButton.disabled = pageNum <= 1;
+        nextButton.disabled = pageNum >= totalPages;
+    }
+
+    prevButton.addEventListener('click', () => {
+        if (currentMode === 'single' && pageInput.value > 1) {
+            showSinglePage(parseInt(pageInput.value) - 1);
+        }
+    });
+
+    nextButton.addEventListener('click', () => {
+        if (currentMode === 'single' && pageInput.value < totalPages) {
+            showSinglePage(parseInt(pageInput.value) + 1);
+        }
+    });
+
+    pageInput.addEventListener('change', () => {
+        let pageNum = parseInt(pageInput.value);
+        if (pageNum < 1) pageNum = 1;
+        if (pageNum > totalPages) pageNum = totalPages;
+        if (currentMode === 'single') {
+            showSinglePage(pageNum);
+        }
+    });
+
+    // Navigation au clavier
+    document.addEventListener('keydown', (e) => {
+        if (currentMode === 'single') {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                nextButton.click();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                prevButton.click();
+            }
+        }
+    });
+
+    // Intersection Observer pour le mode vertical
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const page = entry.target.dataset.page;
+                currentPageSpan.textContent = page;
+                pageInput.value = page;
+            }
+        });
+    }, { threshold: 0.5 });
+
+    document.querySelectorAll('.page-item').forEach(page => {
+        observer.observe(page);
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 

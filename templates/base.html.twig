@@ -7,6 +7,9 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <title>{% block title %}RestauZone{% endblock %}</title>
+    {% block stylesheets %}
+        {{ encore_entry_link_tags('app') }}
+    {% endblock %}
 </head>
 <body class="bg-gray-100 text-gray-800 font-sans">
     <!-- Navbar -->
@@ -19,3 +22,11 @@
 
     <!-- Footer -->
     {% include 'parts/footer.html.twig' %}
+
+    {% block javascripts %}
+        {{ encore_entry_script_tags('app') }}
+        {{ importmap('app') }}
+    {% endblock %}
+
+</body>
+</html>
