@@ -7,6 +7,7 @@ use App\Entity\Anime;
 use App\Entity\User;
 use App\Repository\MangaRepository;
 use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -16,24 +17,19 @@ use Symfony\Component\Routing\Annotation\Route;
 class DashboardController extends AbstractDashboardController
 {
     public function __construct(
-        private MangaRepository $mangaRepository,
-        private UserRepository $userRepository
-    ) {}
+        private EntityManagerInterface $entityManager
+    ) {
+    }
 
     #[Route('/admin', name: 'admin')]
     public function index(): Response
     {
-        // Récupération des statistiques
-        $totalMangas = $this->mangaRepository->count([]);
-        $totalUsers = $this->userRepository->count([]);
-        $mangasByStatus = $this->mangaRepository->countByStatus();
-        $recentMangas = $this->mangaRepository->findBy([], ['id' => 'DESC'], 5);
+        $mangaCount = $this->entityManager->getRepository(Manga::class)->count([]);
+        $animeCount = $this->entityManager->getRepository(Anime::class)->count([]);
 
         return $this->render('admin/dashboard.html.twig', [
-            'total_mangas' => $totalMangas,
-            'total_users' => $totalUsers,
-            'mangas_by_status' => $mangasByStatus,
-            'recent_mangas' => $recentMangas,
+            'manga_count' => $mangaCount,
+            'anime_count' => $animeCount,
         ]);
     }
 
