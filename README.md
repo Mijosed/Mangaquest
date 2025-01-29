@@ -18,3 +18,7 @@
    ```bash
     php bin/console app:fetch-anime
    ```
+5. **Charger les mangas :**
+   ```bash
+    php bin/console app:import-manga
+   ```
