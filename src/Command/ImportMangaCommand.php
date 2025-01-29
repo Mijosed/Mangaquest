@@ -31,16 +31,26 @@ class ImportMangaCommand extends Command
         $io->info('Début de l\'importation des mangas...');
         
         try {
+            // Vider la table manga avant l'import
+            $connection = $this->entityManager->getConnection();
+            $platform = $connection->getDatabasePlatform();
+            $connection->executeStatement($platform->getTruncateTableSQL('manga', true));
+            
             $result = $this->mangaDexApi->getMangaList();
             $mangas = $result['data'];
-            
-            // Debug pour voir la structure des données
-            $io->info('Structure des données reçues : ' . json_encode(array_slice($mangas, 0, 1), JSON_PRETTY_PRINT));
             
             foreach ($mangas as $mangaData) {
                 if (!isset($mangaData['id'])) {
                     $io->warning('Manga sans ID trouvé : ' . json_encode($mangaData));
                     continue;
+                }
+
+                // Vérifier si le manga existe déjà
+                $existingManga = $this->entityManager->getRepository(Manga::class)
+                    ->findOneBy(['mangaDexId' => $mangaData['id']]);
+                
+                if ($existingManga) {
+                    continue; // Sauter ce manga s'il existe déjà
                 }
 
                 $manga = new Manga();

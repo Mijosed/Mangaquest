@@ -2,50 +2,148 @@
 
 {% block title %}Catalogue Manga{% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search');
+            let timeoutId;
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    document.getElementById('searchForm').submit();
+                }, 500);
+            });
+        });
+    </script>
+{% endblock %}
+
 {% block content %}
     <div class="container mx-auto px-4 py-8">
         <h1 class="text-3xl font-bold mb-8">Catalogue Manga</h1>
-        
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {% for manga in mangas %}
-                <div class="manga-card">
-                    <a href="{{ path('app_manga_show', {mangaDexId: manga.mangaDexId}) }}" class="block">
-                        {% if manga.coverImage %}
-                            <img src="https://uploads.mangadex.org/covers/{{ manga.mangaDexId }}/{{ manga.coverImage }}"
-                                 alt="{{ manga.title }}"
-                                 class="w-full h-64 object-cover rounded-lg shadow-lg"
-                                 referrerpolicy="no-referrer">
-                        {% endif %}
-                        <h2 class="mt-2 text-lg font-semibold">{{ manga.title }}</h2>
-                    </a>
-                </div>
+
+        {# Filtre alphabétique #}
+        <div class="mb-6 flex flex-wrap gap-2 justify-center">
+            <a href="{{ path('app_manga_list') }}" 
+               class="px-3 py-1 {% if not letter %}bg-blue-600{% else %}bg-blue-500{% endif %} text-white rounded hover:bg-blue-600">
+                Tous
+            </a>
+            {% for char in alphabet %}
+                <a href="{{ path('app_manga_list', {letter: char}) }}" 
+                   class="px-3 py-1 {% if letter == char %}bg-blue-600{% else %}bg-blue-500{% endif %} text-white rounded hover:bg-blue-600">
+                    {{ char }}
+                </a>
             {% endfor %}
         </div>
 
-        {# Pagination #}
-        {% if maxPages > 1 %}
-            <div class="mt-8 flex justify-center gap-2">
-                {% if currentPage > 1 %}
-                    <a href="{{ path('app_manga_list', {page: currentPage - 1}) }}" 
-                       class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                        Précédent
-                    </a>
-                {% endif %}
+        {# Barre de recherche et filtres #}
+        <div class="mb-8">
+            <form id="searchForm" class="flex flex-col md:flex-row gap-4 items-end" method="GET">
+                <div class="flex-1">
+                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Rechercher</label>
+                    <div class="flex gap-2">
+                        <input type="text" 
+                               id="search" 
+                               name="search" 
+                               value="{{ search }}" 
+                               placeholder="Rechercher un manga..."
+                               class="w-full px-4 py-2 border rounded-lg">
+                        <button type="submit" 
+                                class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                            Rechercher
+                        </button>
+                    </div>
+                </div>
 
-                {% for i in max(1, currentPage - 2)..min(maxPages, currentPage + 2) %}
-                    <a href="{{ path('app_manga_list', {page: i}) }}" 
-                       class="px-4 py-2 {% if currentPage == i %}bg-blue-600{% else %}bg-blue-500{% endif %} text-white rounded hover:bg-blue-600">
-                        {{ i }}
-                    </a>
-                {% endfor %}
+                <div>
+                    <label for="sort" class="block text-sm font-medium text-gray-700 mb-1">Trier par</label>
+                    <select name="sort" id="sort" class="px-4 py-2 border rounded-lg" onchange="this.form.submit()">
+                        <option value="title" {% if sort == 'title' %}selected{% endif %}>Titre</option>
+                        <option value="year" {% if sort == 'year' %}selected{% endif %}>Année</option>
+                    </select>
+                </div>
 
-                {% if currentPage < maxPages %}
-                    <a href="{{ path('app_manga_list', {page: currentPage + 1}) }}" 
-                       class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-                        Suivant
-                    </a>
+                <div>
+                    <label for="order" class="block text-sm font-medium text-gray-700 mb-1">Ordre</label>
+                    <select name="order" id="order" class="px-4 py-2 border rounded-lg" onchange="this.form.submit()">
+                        <option value="ASC" {% if order == 'ASC' %}selected{% endif %}>Croissant</option>
+                        <option value="DESC" {% if order == 'DESC' %}selected{% endif %}>Décroissant</option>
+                    </select>
+                </div>
+
+                {% if letter %}
+                    <input type="hidden" name="letter" value="{{ letter }}">
                 {% endif %}
+                <input type="hidden" name="page" value="1">
+            </form>
+        </div>
+
+        {# Résultats #}
+        {% if total == 0 %}
+            <div class="text-center py-8">
+                <p class="text-gray-500">Aucun manga trouvé</p>
             </div>
+        {% else %}
+            <div class="grid grid-cols-5 gap-4">
+                {% for manga in mangas %}
+                    <div class="manga-card">
+                        <a href="{{ path('app_manga_show', {mangaDexId: manga.mangaDexId}) }}" class="block">
+                            {% if manga.coverImage %}
+                                <img src="https://uploads.mangadex.org/covers/{{ manga.mangaDexId }}/{{ manga.coverImage }}"
+                                     alt="{{ manga.title }}"
+                                     class="w-full h-48 object-cover rounded-lg shadow-lg"
+                                     referrerpolicy="no-referrer">
+                            {% endif %}
+                            <h2 class="mt-2 text-sm font-semibold truncate">{{ manga.title }}</h2>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+
+            {# Pagination avec conservation des filtres #}
+            {% if maxPages > 1 %}
+                <div class="mt-8 flex justify-center gap-2">
+                    {% if currentPage > 1 %}
+                        <a href="{{ path('app_manga_list', {
+                            page: currentPage - 1,
+                            search: search,
+                            sort: sort,
+                            order: order,
+                            letter: letter
+                        }) }}" 
+                           class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                            Précédent
+                        </a>
+                    {% endif %}
+
+                    {% for i in max(1, currentPage - 2)..min(maxPages, currentPage + 2) %}
+                        <a href="{{ path('app_manga_list', {
+                            page: i,
+                            search: search,
+                            sort: sort,
+                            order: order,
+                            letter: letter
+                        }) }}" 
+                           class="px-4 py-2 {% if currentPage == i %}bg-blue-600{% else %}bg-blue-500{% endif %} text-white rounded hover:bg-blue-600">
+                            {{ i }}
+                        </a>
+                    {% endfor %}
+
+                    {% if currentPage < maxPages %}
+                        <a href="{{ path('app_manga_list', {
+                            page: currentPage + 1,
+                            search: search,
+                            sort: sort,
+                            order: order,
+                            letter: letter
+                        }) }}" 
+                           class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                            Suivant
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
         {% endif %}
     </div>
 {% endblock %}

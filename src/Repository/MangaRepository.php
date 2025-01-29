@@ -51,4 +51,46 @@ class MangaRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findBySearch(string $search = null, ?string $letter = null, string $sort = 'title', string $order = 'ASC', int $page = 1, int $limit = 15): array
+    {
+        $offset = ($page - 1) * $limit;
+        
+        $qb = $this->createQueryBuilder('m')
+            ->distinct();
+
+        if ($search) {
+            $qb->andWhere('m.title LIKE :search')
+               ->setParameter('search', '%' . $search . '%');
+        }
+
+        if ($letter) {
+            $qb->andWhere('m.title LIKE :letter')
+               ->setParameter('letter', $letter . '%');
+        }
+
+        $qb->orderBy('m.' . $sort, $order)
+           ->setFirstResult($offset)
+           ->setMaxResults($limit);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function countBySearch(string $search = null, ?string $letter = null): int
+    {
+        $qb = $this->createQueryBuilder('m')
+            ->select('COUNT(DISTINCT m.id)');
+
+        if ($search) {
+            $qb->andWhere('m.title LIKE :search')
+               ->setParameter('search', '%' . $search . '%');
+        }
+
+        if ($letter) {
+            $qb->andWhere('m.title LIKE :letter')
+               ->setParameter('letter', $letter . '%');
+        }
+
+        return $qb->getQuery()->getSingleScalarResult();
+    }
 }

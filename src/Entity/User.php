@@ -21,24 +21,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $username = null;
-
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column]
+    private array $roles = [];
+
+    #[ORM\Column]
     private ?string $password = null;
 
-    private string $plainPassword = '';
-
-    #[ORM\Column(type: 'json')]
-    private array $roles = [];
+    private ?string $plainPassword = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $resetPasswordToken = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $avatar = null;
 
     /**
@@ -65,18 +62,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function getUsername(): ?string
-    {
-        return $this->username;
-    }
-
-    public function setUsername(string $username): static
-    {
-        $this->username = $username;
-
-        return $this;
-    }
-
     public function getEmail(): ?string
     {
         return $this->email;
@@ -85,11 +70,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
-    public function getPassword(): ?string
+    public function getUsername(): string
+    {
+        return $this->getUserIdentifier();
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
+        return $this;
+    }
+
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -97,40 +104,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): static
     {
         $this->password = $password;
-
         return $this;
-    }
-
-    public function getUserIdentifier(): string
-    {
-        return $this->email;
     }
 
     public function eraseCredentials(): void
     {
-        $this->plainPassword = '';
+        $this->plainPassword = null;
     }
 
-    public function getRoles(): array
-    {
-        return $this->roles;
-    }
-
-    public function setRoles(array $roles): static
-    {
-        $this->roles = $roles;
-
-        return $this;
-    }
-
-    public function getPlainPassword(): string
+    public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
     }
 
-    public function setPlainPassword(string $plainPassword): void
+    public function setPlainPassword(?string $plainPassword): self
     {
         $this->plainPassword = $plainPassword;
+        return $this;
     }
 
     public function getResetPasswordToken(): ?string
@@ -150,10 +140,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->avatar;
     }
 
-    public function setAvatar(string $avatar): static
+    public function setAvatar(?string $avatar): static
     {
         $this->avatar = $avatar;
-
         return $this;
     }
 

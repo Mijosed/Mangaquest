@@ -12,7 +12,7 @@ class MangaDexApiService
         private readonly HttpClientInterface $httpClient
     ) {}
 
-    public function getMangaList(int $page = 1, int $limit = 24): array
+    public function getMangaList(int $page = 1, int $limit = 50): array
     {
         $offset = ($page - 1) * $limit;
         
