@@ -74,7 +74,7 @@ class AniListApiService
                 $apiData['startDate']['month'] ?? 1,
                 $apiData['startDate']['day'] ?? 1
             );
-            $anime->setReleaseDate($date);
+            $anime->setReleaseDate($date->format('Y-m-d'));
         }
         
         $anime->setPosterImage($apiData['coverImage']['large'] ?? '');
