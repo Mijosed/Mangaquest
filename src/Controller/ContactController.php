@@ -25,7 +25,7 @@ class ContactController extends AbstractController
             // Envoyer un email
             $email = (new Email())
                 ->from($data['email'])
-                ->to('contact@restaurant-tp.com')
+                ->to('contact@mangaquest.com')
                 ->subject('Nouveau message de contact')
                 ->text(
                     sprintf(
