@@ -16,47 +16,59 @@ class AnimeRepository extends ServiceEntityRepository
         parent::__construct($registry, Anime::class);
     }
 
-    //    /**
-    //     * @return Anime[] Returns an array of Anime objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('a.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Anime
-    //    {
-    //        return $this->createQueryBuilder('a')
-    //            ->andWhere('a.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
-
-    public function searchByTitle(string $query): array
+    public function findBySearch(string $search = null, ?string $letter = null, string $sort = 'title', string $order = 'ASC', int $page = 1, int $limit = 15): array
     {
-        return $this->createQueryBuilder('a')
-            ->where('LOWER(a.title) LIKE LOWER(:query)')
-            ->setParameter('query', '%' . $query . '%')
-            ->orderBy('a.title', 'ASC')
-            ->getQuery()
-            ->getResult();
+        $offset = ($page - 1) * $limit;
+        
+        $qb = $this->createQueryBuilder('a')
+            ->distinct();
+
+        if ($search) {
+            $qb->andWhere('LOWER(a.title) LIKE LOWER(:search)')
+               ->setParameter('search', '%' . $search . '%');
+        }
+
+        if ($letter) {
+            $qb->andWhere('a.title LIKE :letter')
+               ->setParameter('letter', $letter . '%');
+        }
+
+        if ($sort === 'year') {
+            $qb->orderBy('a.releaseDate', $order);
+        } else {
+            $qb->orderBy('a.' . $sort, $order);
+        }
+
+        $qb->setFirstResult($offset)
+           ->setMaxResults($limit);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function countBySearch(string $search = null, ?string $letter = null): int
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->select('COUNT(DISTINCT a.id)');
+
+        if ($search) {
+            $qb->andWhere('LOWER(a.title) LIKE LOWER(:search)')
+               ->setParameter('search', '%' . $search . '%');
+        }
+
+        if ($letter) {
+            $qb->andWhere('a.title LIKE :letter')
+               ->setParameter('letter', $letter . '%');
+        }
+
+        return $qb->getQuery()->getSingleScalarResult();
     }
 
     public function findByTitles(array $titles): array
-    {
-        return $this->createQueryBuilder('a')
-            ->where('a.title IN (:titles)')
-            ->setParameter('titles', $titles)
-            ->getQuery()
-            ->getResult();
-    }
+{
+    return $this->createQueryBuilder('a')
+        ->where('a.title IN (:titles)') 
+        ->setParameter('titles', $titles)
+        ->getQuery()
+        ->getResult();
+}
 }

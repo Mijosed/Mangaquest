@@ -116,4 +116,9 @@ class Anime
         $this->posterImage = $posterImage;
         return $this;
     }
+
+    public function getYear(): ?int
+{
+    return $this->releaseDate ? (new \DateTime($this->releaseDate))->format('Y') : null;
+}
 }
