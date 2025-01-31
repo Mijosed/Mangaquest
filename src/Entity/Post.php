@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\PostRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
@@ -15,20 +16,22 @@ class Post
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $title = null;
-
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $image = null;
+    #[ORM\ManyToOne(inversedBy: 'posts')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $author = null;
+
+    #[ORM\ManyToOne(inversedBy: 'posts')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Topic $topic = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\ManyToOne(inversedBy: 'posts')]
-    private ?Community $community = null;
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $editedAt = null;
 
     /**
      * @var Collection<int, Comment>
@@ -36,30 +39,15 @@ class Post
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'post')]
     private Collection $comments;
 
-    #[ORM\ManyToOne(inversedBy: 'posts')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $author = null;
-
     public function __construct()
     {
         $this->comments = new ArrayCollection();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getTitle(): ?string
-    {
-        return $this->title;
-    }
-
-    public function setTitle(string $title): static
-    {
-        $this->title = $title;
-
-        return $this;
     }
 
     public function getContent(): ?string
@@ -74,14 +62,26 @@ class Post
         return $this;
     }
 
-    public function getImage(): ?string
+    public function getAuthor(): ?User
     {
-        return $this->image;
+        return $this->author;
     }
 
-    public function setImage(?string $image): static
+    public function setAuthor(?User $author): static
     {
-        $this->image = $image;
+        $this->author = $author;
+
+        return $this;
+    }
+
+    public function getTopic(): ?Topic
+    {
+        return $this->topic;
+    }
+
+    public function setTopic(?Topic $topic): static
+    {
+        $this->topic = $topic;
 
         return $this;
     }
@@ -98,14 +98,14 @@ class Post
         return $this;
     }
 
-    public function getCommunity(): ?Community
+    public function getEditedAt(): ?\DateTimeImmutable
     {
-        return $this->community;
+        return $this->editedAt;
     }
 
-    public function setCommunity(?Community $community): static
+    public function setEditedAt(?\DateTimeImmutable $editedAt): static
     {
-        $this->community = $community;
+        $this->editedAt = $editedAt;
 
         return $this;
     }
@@ -136,18 +136,6 @@ class Post
                 $comment->setPost(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getAuthor(): ?User
-    {
-        return $this->author;
-    }
-
-    public function setAuthor(?User $author): static
-    {
-        $this->author = $author;
 
         return $this;
     }

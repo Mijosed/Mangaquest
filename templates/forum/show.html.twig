@@ -1,0 +1,130 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ topic.title }}{% endblock %}
+
+{% block content %}
+    <div class="container my-4">
+        {% if topic.imageUrl %}
+            <div class="topic-header mb-4">
+                <img src="{{ topic.imageUrl }}" class="w-100 rounded" alt="{{ topic.title }}" style="height: 300px; object-fit: cover;">
+            </div>
+        {% endif %}
+
+        {# Sujet #}
+        <div class="card mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1 class="h3 mb-0">{{ topic.title }}</h1>
+                    <div>
+                        <small class="text-muted me-3">{{ topic.views }} vues</small>
+                        {% if is_granted('ROLE_USER') %}
+                            <a href="{{ path('app_forum_report_topic', {'id': topic.id}) }}" 
+                               class="btn btn-sm btn-warning">
+                                Signaler
+                            </a>
+                        {% endif %}
+                        {% if is_granted('ROLE_MODERATOR') %}
+                            <a href="{{ path('app_forum_delete_topic', {'id': topic.id}) }}" 
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce sujet ?')">
+                                Supprimer
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <img src="{{ topic.author.avatar }}" alt="Avatar" class="rounded-circle" width="40">
+                        <span class="ms-2">{{ topic.author.email }}</span>
+                    </div>
+                    <small class="text-muted">{{ topic.createdAt|date('d/m/Y H:i') }}</small>
+                </div>
+                <div class="topic-content">
+                    {{ topic.content|nl2br }}
+                </div>
+            </div>
+        </div>
+
+        {# Réponses #}
+        <h2 class="h4 mb-3">Réponses</h2>
+        {% for post in topic.posts %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <img src="{{ post.author.avatar }}" alt="Avatar" class="rounded-circle" width="40">
+                            <span class="ms-2">{{ post.author.email }}</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            {% if is_granted('ROLE_USER') %}
+                                <a href="{{ path('app_forum_report_post', {'id': post.id}) }}" 
+                                   class="btn btn-sm btn-warning me-2">
+                                    Signaler
+                                </a>
+                            {% endif %}
+                            {% if is_granted('ROLE_MODERATOR') %}
+                                <a href="{{ path('app_forum_delete_post', {'id': post.id}) }}" 
+                                   class="btn btn-sm btn-danger me-2"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce message ?')">
+                                    Supprimer
+                                </a>
+                            {% endif %}
+                            {% if post.editedAt %}
+                                <small>Modifié le {{ post.editedAt|date('d/m/Y H:i') }}</small>
+                            {% else %}
+                                <small>{{ post.createdAt|date('d/m/Y H:i') }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        {{ post.content|nl2br }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+        {# Formulaire de réponse #}
+        {% if is_granted('ROLE_USER') %}
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="h5 mb-0">Répondre</h3>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                        {{ form_widget(form) }}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Envoyer</button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Vous devez être connecté pour répondre à ce sujet.
+                <a href="{{ path('app_login') }}">Se connecter</a>
+            </div>
+        {% endif %}
+    </div>
+
+    {# Au début du contenu #}
+    {% if topic.isNsfw %}
+        <div class="alert alert-danger mb-4">
+            <h4 class="alert-heading">⚠️ Contenu sensible (NSFW)</h4>
+            <p class="mb-0">Ce contenu est réservé aux utilisateurs majeurs.</p>
+        </div>
+    {% endif %}
+
+    {# Après l'alerte NSFW #}
+    {% if topic.hasSpoiler %}
+        <div class="alert alert-warning mb-4">
+            <h4 class="alert-heading">⚠️ Attention Spoiler</h4>
+            {% if topic.spoilerWarning %}
+                <p class="mb-0">{{ topic.spoilerWarning }}</p>
+            {% else %}
+                <p class="mb-0">Ce sujet contient des spoilers.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock %} 

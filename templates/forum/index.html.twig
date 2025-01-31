@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Forum{% endblock %}
+
+{% block content %}
+    <div class="container my-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Forum</h1>
+            {% if is_granted('ROLE_USER') %}
+                <a href="{{ path('app_forum_new') }}" class="btn btn-primary">
+                    Nouveau sujet
+                </a>
+            {% endif %}
+        </div>
+
+        {# Sujets populaires avec carrousel #}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h2 class="h5 mb-0">Sujets populaires</h2>
+            </div>
+            <div id="popularTopics" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    {% for topic in popular_topics %}
+                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                            {% if topic.imageUrl %}
+                                <img src="{{ topic.imageUrl }}" class="d-block w-100" alt="{{ topic.title }}" style="height: 300px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 300px;">
+                                    <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                            <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 p-3">
+                                <h3 class="h5">{{ topic.title }}</h3>
+                                <p class="mb-0">{{ topic.views }} vues • {{ topic.posts|length }} réponses</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#popularTopics" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Précédent</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#popularTopics" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Suivant</span>
+                </button>
+            </div>
+        </div>
+
+        {# Liste des sujets avec images #}
+        <div class="card">
+            <div class="card-header">
+                <h2 class="h5 mb-0">Tous les sujets</h2>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for topic in topics %}
+                    <div class="list-group-item">
+                        <div class="row g-0">
+                            {% if topic.imageUrl %}
+                                <div class="col-md-3">
+                                    <img src="{{ topic.imageUrl }}" class="img-fluid rounded" alt="{{ topic.title }}" style="height: 150px; object-fit: cover;">
+                                </div>
+                            {% endif %}
+                            <div class="col-md-{{ topic.imageUrl ? '9' : '12' }}">
+                                <div class="p-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <a href="{{ path('app_forum_show', {'id': topic.id}) }}" class="h5 mb-1 d-block">
+                                                {{ topic.title }}
+                                                {% if topic.isNsfw %}
+                                                    <span class="badge bg-danger">NSFW</span>
+                                                {% endif %}
+                                                {% if topic.hasSpoiler %}
+                                                    <span class="badge bg-warning text-dark">Spoiler</span>
+                                                {% endif %}
+                                            </a>
+                                            <small class="text-muted">
+                                                Par {{ topic.author.email }} le {{ topic.createdAt|date('d/m/Y H:i') }}
+                                            </small>
+                                        </div>
+                                        <div class="text-end">
+                                            <div>{{ topic.posts|length }} réponses</div>
+                                            <small class="text-muted">{{ topic.views }} vues</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="list-group-item text-center">
+                        Aucun sujet n'a été créé pour le moment.
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %} 
