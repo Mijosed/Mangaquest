@@ -22,6 +22,10 @@ security:
             form_login:
                 login_path: app_login
                 check_path: app_login
+                enable_csrf: true
+                username_parameter: _username
+                password_parameter: _password
+                failure_handler: security.authentication.failure_handler
             logout:
                 path: app_logout
 
