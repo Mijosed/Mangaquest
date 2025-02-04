@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Signalements{% endblock %}
+
+{% block content %}
+    <div class="container my-4">
+        <h1>Signalements en attente</h1>
+
+        {% for report in reports %}
+            <div class="card mb-3">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            Signalé par {{ report.reporter.email }}
+                            le {{ report.createdAt|date('d/m/Y H:i') }}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Raison du signalement</h5>
+                    <p>{{ report.reason }}</p>
+
+                    <h5 class="card-title">Contenu signalé</h5>
+                    {% if report.topic %}
+                        <div class="alert alert-info">
+                            <h6>Sujet : {{ report.topic.title }}</h6>
+                            <p>{{ report.topic.content|slice(0, 200) }}...</p>
+                            <div class="mt-2">
+                                <a href="{{ path('app_forum_show', {'id': report.topic.id}) }}" class="btn btn-sm btn-primary">Voir</a>
+                                <a href="{{ path('app_forum_delete_topic', {'id': report.topic.id}) }}" 
+                                   class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce sujet ?')">
+                                    Supprimer
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if report.post %}
+                        <div class="alert alert-info">
+                            <p>{{ report.post.content|slice(0, 200) }}...</p>
+                            <div class="mt-2">
+                                <a href="{{ path('app_forum_show', {'id': report.post.topic.id}) }}" class="btn btn-sm btn-primary">Voir</a>
+                                <a href="{{ path('app_forum_delete_post', {'id': report.post.id}) }}" 
+                                   class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce message ?')">
+                                    Supprimer
+                                </a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Aucun signalement en attente.
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %} 

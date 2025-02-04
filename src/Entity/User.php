@@ -10,6 +10,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -45,18 +46,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $communities;
 
     /**
+     * @var Collection<int, Topic>
+     */
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Topic::class, orphanRemoval: true)]
+    private Collection $topics;
+
+    /**
      * @var Collection<int, Post>
      */
-    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'author')]
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Post::class, orphanRemoval: true)]
     private Collection $posts;
 
     #[ORM\Column]
     private bool $isVerified = false;
 
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $birthDate = null;
+
     public function __construct()
     {
         $this->roles = ['ROLE_USER'];
         $this->communities = new ArrayCollection();
+        $this->topics = new ArrayCollection();
         $this->posts = new ArrayCollection();
     }
 
@@ -180,6 +191,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
+     * @return Collection<int, Topic>
+     */
+    public function getTopics(): Collection
+    {
+        return $this->topics;
+    }
+
+    public function addTopic(Topic $topic): static
+    {
+        if (!$this->topics->contains($topic)) {
+            $this->topics->add($topic);
+            $topic->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTopic(Topic $topic): static
+    {
+        if ($this->topics->removeElement($topic)) {
+            // set the owning side to null (unless already changed)
+            if ($topic->getAuthor() === $this) {
+                $topic->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * @return Collection<int, Post>
      */
     public function getPosts(): Collection
@@ -219,5 +260,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->isVerified = $isVerified;
 
         return $this;
+    }
+
+    public function getBirthDate(): ?\DateTimeInterface
+    {
+        return $this->birthDate;
+    }
+
+    public function setBirthDate(?\DateTimeInterface $birthDate): static
+    {
+        $this->birthDate = $birthDate;
+        return $this;
+    }
+
+    public function isAdult(): bool
+    {
+        if (!$this->birthDate) {
+            return false;
+        }
+
+        $age = $this->birthDate->diff(new \DateTime())->y;
+        return $age >= 18;
     }
 }

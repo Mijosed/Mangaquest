@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Topics en attente de validation{% endblock %}
+
+{% block content %}
+    <div class="container my-4">
+        <h1>Topics en attente de validation</h1>
+
+        {% for topic in topics %}
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h2 class="h5 mb-0">{{ topic.title }}</h2>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            Par {{ topic.author.email }} le {{ topic.createdAt|date('d/m/Y H:i') }}
+                        </small>
+                    </div>
+                    <div class="topic-content mb-3">
+                        {{ topic.content|nl2br }}
+                    </div>
+                    <form method="post" action="{{ path('app_admin_topic_approve', {'id': topic.id}) }}" class="mb-3">
+                        <div class="form-check mb-2">
+                            <input type="checkbox" class="form-check-input" id="hasSpoiler_{{ topic.id }}" name="hasSpoiler" {% if topic.hasSpoiler %}checked{% endif %}>
+                            <label class="form-check-label" for="hasSpoiler_{{ topic.id }}">Contient des spoilers</label>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Avertissement spoiler</label>
+                            <input type="text" class="form-control" name="spoilerWarning" value="{{ topic.spoilerWarning }}" placeholder="Ex: Spoiler sur la saison 2 de One Piece">
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">Approuver</button>
+                            <a href="{{ path('app_admin_topic_reject', {'id': topic.id}) }}" 
+                               class="btn btn-danger"
+                               onclick="return confirm('Êtes-vous sûr de vouloir rejeter ce sujet ?')">
+                                Rejeter
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                Aucun topic en attente de validation.
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %} 
