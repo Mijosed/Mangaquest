@@ -6,6 +6,7 @@ use App\Entity\Manga;
 use App\Entity\Anime;
 use App\Entity\User;
 use App\Entity\Contact;
+use App\Entity\Review;
 use App\Repository\MangaRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -48,13 +49,14 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::section('Contenu');
         yield MenuItem::linkToCrud('Mangas', 'fas fa-book', Manga::class);
         yield MenuItem::linkToCrud('Animes', 'fas fa-tv', Anime::class);
+        yield MenuItem::linkToCrud('Avis', 'fas fa-star', Review::class);
         
         yield MenuItem::section('Utilisateurs');
         yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-users', User::class)
             ->setPermission('ROLE_ADMIN');
         
         yield MenuItem::section('Messages');
-        yield MenuItem::linkToCrud('Messages de contact', 'fas fa-envelope', Contact::class);
+        yield MenuItem::linkToCrud('Suivi des mails de contact', 'fas fa-envelope', Contact::class);
         
         yield MenuItem::section('Navigation');
         yield MenuItem::linkToRoute('Retour au site', 'fas fa-arrow-left', 'app_manga_list');
