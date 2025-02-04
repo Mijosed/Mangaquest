@@ -45,7 +45,7 @@ class ResetPasswordController extends AbstractController
             $email = $form->get('email')->getData();
 
             return $this->processSendingPasswordResetEmail($email, $mailer, $translator
-            );
+);
         }
 
         return $this->render('reset_password/request.html.twig', [
@@ -85,7 +85,6 @@ class ResetPasswordController extends AbstractController
         }
 
         $token = $this->getTokenFromSession();
-
         if (null === $token) {
             throw $this->createNotFoundException('No reset password token found in the URL or in the session.');
         }
@@ -157,7 +156,7 @@ class ResetPasswordController extends AbstractController
         }
 
         $email = (new TemplatedEmail())
-            ->from(new Address('reset-confirmation@tp-note.com', 'Reset Confirmation Bot'))
+            ->from(new Address('reset-password@mangaquest.com', 'Mangaquest'))
             ->to((string) $user->getEmail())
             ->subject('Your password reset request')
             ->htmlTemplate('reset_password/email.html.twig')

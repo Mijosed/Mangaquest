@@ -13,6 +13,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ArrayField;
 
 class UserCrudController extends AbstractCrudController
 {
@@ -45,25 +46,18 @@ class UserCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        $fields = [
+        return [
             IdField::new('id')->hideOnForm(),
-            EmailField::new('email', 'Email'),
-            ChoiceField::new('roles', 'Rôles')
+            EmailField::new('email'),
+            ChoiceField::new('roles')
                 ->setChoices([
                     'Utilisateur' => 'ROLE_USER',
                     'Administrateur' => 'ROLE_ADMIN',
+                    'Banni' => 'ROLE_BANNED'
                 ])
                 ->allowMultipleChoices()
                 ->renderAsBadges(),
         ];
-
-        if ($pageName === Crud::PAGE_NEW || $pageName === Crud::PAGE_EDIT) {
-            $fields[] = TextField::new('plainPassword', 'Mot de passe')
-                ->setFormType(PasswordType::class)
-                ->setRequired($pageName === Crud::PAGE_NEW);
-        }
-
-        return $fields;
     }
 
     public function persistEntity($entityManager, $entityInstance): void
