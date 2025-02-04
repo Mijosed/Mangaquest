@@ -8,6 +8,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Entity\Review;
+use App\Form\ReviewType;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 
 class MangaController extends AbstractController
 {
@@ -48,7 +53,12 @@ class MangaController extends AbstractController
     }
 
     #[Route('/manga/{mangaDexId}', name: 'app_manga_show')]
-    public function show(string $mangaDexId): Response
+    public function show(
+        string $mangaDexId, 
+        Request $request, 
+        EntityManagerInterface $entityManager,
+        MailerInterface $mailer
+    ): Response
     {
         $localManga = $this->mangaRepository->findOneBy(['mangaDexId' => $mangaDexId]);
         
@@ -59,10 +69,54 @@ class MangaController extends AbstractController
         $mangaDetails = $this->mangaDexApi->getMangaDetails($mangaDexId);
         $chapters = $this->mangaDexApi->getMangaChapters($mangaDexId);
 
+        // Récupérer les reviews existantes
+        $reviews = $entityManager->getRepository(Review::class)->findBy(
+            ['manga' => $localManga],
+            ['createdAt' => 'DESC']
+        );
+
+        // Créer le formulaire de review si l'utilisateur est connecté
+        $review = new Review();
+        $form = null;
+        
+        if ($this->getUser()) {
+            $form = $this->createForm(ReviewType::class, $review);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $review->setUser($this->getUser());
+                $review->setManga($localManga);
+                
+                $entityManager->persist($review);
+                $entityManager->flush();
+
+                // Envoyer l'email de notification
+                $email = (new Email())
+                    ->from('noreply@mangaquest.com')
+                    ->to('admin@mangaquest.com')
+                    ->subject('Nouvelle review manga')
+                    ->html($this->renderView(
+                        'emails/new_review.html.twig',
+                        [
+                            'review' => $review,
+                            'type' => 'manga',
+                            'title' => $localManga->getTitle()
+                        ]
+                    ));
+
+                $mailer->send($email);
+
+                $this->addFlash('success', 'Votre avis a été publié avec succès !');
+                return $this->redirectToRoute('app_manga_show', ['mangaDexId' => $mangaDexId]);
+            }
+        }
+
         return $this->render('manga/show.html.twig', [
             'manga' => $mangaDetails,
             'localManga' => $localManga,
-            'chapters' => $chapters
+            'chapters' => $chapters,
+            'reviews' => $reviews,
+            'form' => $form?->createView(),
         ]);
     }
 

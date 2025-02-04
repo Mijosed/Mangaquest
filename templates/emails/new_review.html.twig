@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .content {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+        .rating {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0056b3;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>Nouvelle review sur {{ type }}</h2>
+    </div>
+
+    <div class="content">
+        <p><strong>Titre :</strong> {{ title }}</p>
+        <p><strong>Utilisateur :</strong> {{ review.user.email }}</p>
+        <p><strong>Date :</strong> {{ review.createdAt|date('d/m/Y H:i') }}</p>
+        <p class="rating">Note : {{ review.rating }}/10</p>
+        
+        {% if review.comment %}
+            <p><strong>Commentaire :</strong></p>
+            <p>{{ review.comment }}</p>
+        {% else %}
+            <p><em>Pas de commentaire</em></p>
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        <p>Cet email a été envoyé automatiquement par MangaQuest.</p>
+        <p>Vous pouvez gérer les reviews dans le panneau d'administration.</p>
+    </div>
+</body>
+</html> 

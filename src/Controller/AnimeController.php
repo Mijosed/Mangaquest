@@ -7,6 +7,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Entity\Review;
+use App\Form\ReviewType;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 
 #[Route('/anime')]
 class AnimeController extends AbstractController
@@ -43,16 +48,65 @@ class AnimeController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_anime_show')]
-    public function show(int $id, AnimeRepository $animeRepository): Response
-    {
+    public function show(
+        int $id, 
+        Request $request, 
+        EntityManagerInterface $entityManager, 
+        AnimeRepository $animeRepository,
+        MailerInterface $mailer
+    ): Response {
         $anime = $animeRepository->find($id);
 
         if (!$anime) {
             throw $this->createNotFoundException('Anime non trouvé');
         }
 
+        // Récupérer les reviews existantes
+        $reviews = $entityManager->getRepository(Review::class)->findBy(
+            ['anime' => $anime],
+            ['createdAt' => 'DESC']
+        );
+
+        // Créer le formulaire de review si l'utilisateur est connecté
+        $review = new Review();
+        $form = null;
+        
+        if ($this->getUser()) {
+            $form = $this->createForm(ReviewType::class, $review);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $review->setUser($this->getUser());
+                $review->setAnime($anime);
+                
+                $entityManager->persist($review);
+                $entityManager->flush();
+
+                // Envoyer l'email de notification
+                $email = (new Email())
+                    ->from('noreply@mangaquest.com')
+                    ->to('admin@mangaquest.com')
+                    ->subject('Nouvelle review anime')
+                    ->html($this->renderView(
+                        'emails/new_review.html.twig',
+                        [
+                            'review' => $review,
+                            'type' => 'anime',
+                            'title' => $anime->getTitle()
+                        ]
+                    ));
+
+                $mailer->send($email);
+
+                $this->addFlash('success', 'Votre avis a été publié avec succès !');
+                return $this->redirectToRoute('app_anime_show', ['id' => $id]);
+            }
+        }
+
         return $this->render('anime/show.html.twig', [
             'anime' => $anime,
+            'reviews' => $reviews,
+            'form' => $form?->createView(),
         ]);
     }
 }
