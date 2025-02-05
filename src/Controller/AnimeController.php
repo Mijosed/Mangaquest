@@ -12,6 +12,7 @@ use App\Form\ReviewType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use App\Repository\FavoriteRepository;
 
 #[Route('/anime')]
 class AnimeController extends AbstractController
@@ -53,7 +54,8 @@ class AnimeController extends AbstractController
         Request $request, 
         EntityManagerInterface $entityManager, 
         AnimeRepository $animeRepository,
-        MailerInterface $mailer
+        MailerInterface $mailer,
+        FavoriteRepository $favoriteRepository
     ): Response {
         $anime = $animeRepository->find($id);
 
@@ -103,10 +105,17 @@ class AnimeController extends AbstractController
             }
         }
 
+        // Vérifier si l'anime est en favori pour l'utilisateur connecté
+        $favorite = null;
+        if ($this->getUser()) {
+            $favorite = $favoriteRepository->findOneByUserAndAnime($this->getUser(), $anime);
+        }
+
         return $this->render('anime/show.html.twig', [
             'anime' => $anime,
             'reviews' => $reviews,
             'form' => $form?->createView(),
+            'favorite' => $favorite,
         ]);
     }
 }

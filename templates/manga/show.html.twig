@@ -17,6 +17,16 @@
         </nav>
     </div>
 
+    {% if is_granted('ROLE_USER') %}
+                    <button 
+                        class="favorite-button {{ favorite ? 'bg-red-500 hover:bg-red-700' : 'bg-blue-500 hover:bg-blue-700' }} text-white font-bold mb-4 py-2 px-4 rounded"
+                        data-id="{{ localManga.mangaDexId }}"
+                        data-type="manga"
+                    >
+                        {{ favorite ? 'Retirer des favoris' : 'Ajouter aux favoris' }}
+                    </button>
+                {% endif %}
+
     {# Informations principales du manga #}
     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
         <div class="flex flex-col md:flex-row">

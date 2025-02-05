@@ -10,6 +10,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Doctrine\DBAL\Connection;
 
 #[AsCommand(
     name: 'app:import-manga',
@@ -19,7 +20,8 @@ class ImportMangaCommand extends Command
 {
     public function __construct(
         private readonly MangaDexApiService $mangaDexApi,
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly Connection $connection
     ) {
         parent::__construct();
     }
@@ -31,10 +33,16 @@ class ImportMangaCommand extends Command
         $io->info('Début de l\'importation des mangas...');
         
         try {
-            // Vider la table manga avant l'import
-            $connection = $this->entityManager->getConnection();
-            $platform = $connection->getDatabasePlatform();
-            $connection->executeStatement($platform->getTruncateTableSQL('manga', true));
+            // Désactiver les contraintes de clé étrangère
+            $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS=0');
+
+            // Supprimer les données liées
+            $this->connection->executeStatement('DELETE FROM favorite WHERE manga_id IS NOT NULL');
+            $this->connection->executeStatement('DELETE FROM review WHERE manga_id IS NOT NULL');
+            $this->connection->executeStatement('TRUNCATE TABLE manga');
+
+            // Réactiver les contraintes de clé étrangère
+            $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS=1');
             
             $result = $this->mangaDexApi->getMangaList();
             $mangas = $result['data'];
@@ -101,6 +109,9 @@ class ImportMangaCommand extends Command
             
             return Command::SUCCESS;
         } catch (\Exception $e) {
+            // En cas d'erreur, s'assurer que les contraintes sont réactivées
+            $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS=1');
+            
             $io->error('Erreur lors de l\'importation : ' . $e->getMessage());
             $io->error('Trace : ' . $e->getTraceAsString());
             

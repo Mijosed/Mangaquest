@@ -13,6 +13,7 @@ use App\Form\ReviewType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use App\Repository\FavoriteRepository;
 
 class MangaController extends AbstractController
 {
@@ -57,7 +58,8 @@ class MangaController extends AbstractController
         string $mangaDexId, 
         Request $request, 
         EntityManagerInterface $entityManager,
-        MailerInterface $mailer
+        MailerInterface $mailer,
+        FavoriteRepository $favoriteRepository
     ): Response
     {
         $localManga = $this->mangaRepository->findOneBy(['mangaDexId' => $mangaDexId]);
@@ -111,12 +113,19 @@ class MangaController extends AbstractController
             }
         }
 
+        // Vérifier si le manga est en favori pour l'utilisateur connecté
+        $favorite = null;
+        if ($this->getUser()) {
+            $favorite = $favoriteRepository->findOneByUserAndManga($this->getUser(), $localManga);
+        }
+
         return $this->render('manga/show.html.twig', [
             'manga' => $mangaDetails,
             'localManga' => $localManga,
             'chapters' => $chapters,
             'reviews' => $reviews,
             'form' => $form?->createView(),
+            'favorite' => $favorite,
         ]);
     }
 
