@@ -66,6 +66,26 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        {% if is_granted('POST_EDIT', post) %}
+                            <div class="mt-2 flex space-x-2">
+                                <a href="{{ path('app_post_edit', {id: post.id}) }}" 
+                                   class="text-sm text-blue-600 hover:text-blue-800">
+                                    Modifier
+                                </a>
+                                
+                                {% if is_granted('POST_DELETE', post) %}
+                                    <form method="post" action="{{ path('app_post_delete', {id: post.id}) }}" 
+                                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette réponse ?');" 
+                                          class="inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+                                        <button type="submit" class="text-sm text-red-600 hover:text-red-800">
+                                            Supprimer
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             {% endfor %}

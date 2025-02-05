@@ -19,6 +19,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Service\NotificationService;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 #[Route('/forum')]
 class ForumController extends AbstractController
@@ -135,5 +136,44 @@ class ForumController extends AbstractController
             'topic' => $topic,
             'form' => $form
         ]);
+    }
+
+    #[Route('/post/{id}/edit', name: 'app_post_edit')]
+    public function editPost(Post $post, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        // Vérifie si l'utilisateur peut modifier ce post
+        $this->denyAccessUnlessGranted('POST_EDIT', $post);
+
+        $form = $this->createForm(PostType::class, $post);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Votre réponse a été modifiée avec succès.');
+            return $this->redirectToRoute('app_forum_show', ['id' => $post->getTopic()->getId()]);
+        }
+
+        return $this->render('forum/edit_post.html.twig', [
+            'form' => $form,
+            'post' => $post
+        ]);
+    }
+
+    #[Route('/post/{id}/delete', name: 'app_post_delete', methods: ['POST'])]
+    public function deletePost(Post $post, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $this->denyAccessUnlessGranted('POST_DELETE', $post);
+
+        if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('_token'))) {
+            $topicId = $post->getTopic()->getId();
+            $entityManager->remove($post);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Votre réponse a été supprimée.');
+            return $this->redirectToRoute('app_forum_show', ['id' => $topicId]);
+        }
+
+        throw new AccessDeniedException('Token CSRF invalide.');
     }
 }
