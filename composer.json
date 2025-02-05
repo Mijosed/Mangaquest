@@ -13,6 +13,7 @@
         "doctrine/orm": "^3.3",
         "easycorp/easyadmin-bundle": "^4.23",
         "hautelook/alice-bundle": "^2.14",
+        "knplabs/knp-time-bundle": "^2.4",
         "phpdocumentor/reflection-docblock": "^5.6",
         "phpstan/phpdoc-parser": "^2.0",
         "symfony/asset": "7.2.*",

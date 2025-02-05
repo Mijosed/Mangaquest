@@ -14,9 +14,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Service\NotificationService;
 
 class TopicCrudController extends AbstractCrudController
 {
+    public function __construct(
+        private NotificationService $notificationService
+    ) {
+    }
+
     public static function getEntityFqcn(): string
     {
         return Topic::class;
@@ -69,5 +76,17 @@ class TopicCrudController extends AbstractCrudController
             ->update(Crud::PAGE_INDEX, Action::DETAIL, function (Action $action) {
                 return $action->setLabel('Voir');
             });
+    }
+
+    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        $originalTopic = $entityManager->getUnitOfWork()->getOriginalEntityData($entityInstance);
+        $wasApproved = $originalTopic['isApproved'] ?? false;
+        
+        parent::updateEntity($entityManager, $entityInstance);
+        
+        if (!$wasApproved && $entityInstance->isApproved()) {
+            $this->notificationService->notifyAuthorTopicApproved($entityInstance);
+        }
     }
 }

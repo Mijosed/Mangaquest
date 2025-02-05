@@ -48,6 +48,9 @@
             "./fixtures/.gitignore"
         ]
     },
+    "knplabs/knp-time-bundle": {
+        "version": "v2.4.0"
+    },
     "nelmio/alice": {
         "version": "3.13",
         "recipe": {

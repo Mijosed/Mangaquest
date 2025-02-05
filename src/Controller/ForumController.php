@@ -18,10 +18,16 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use App\Service\NotificationService;
 
 #[Route('/forum')]
 class ForumController extends AbstractController
 {
+    public function __construct(
+        private NotificationService $notificationService
+    ) {
+    }
+
     #[Route('/', name: 'app_forum_index', methods: ['GET'])]
     public function index(TopicRepository $topicRepository): Response
     {
@@ -76,6 +82,7 @@ class ForumController extends AbstractController
             $entityManager->flush();
 
             if (!$topic->isApproved()) {
+                $this->notificationService->notifyAdminsNewTopic($topic);
                 $this->addFlash('info', 'Votre sujet a été soumis et sera visible après validation par un administrateur.');
                 return $this->redirectToRoute('app_forum_index');
             }
