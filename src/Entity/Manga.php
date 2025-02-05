@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\MangaRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: MangaRepository::class)]
 class Manga
@@ -31,6 +33,18 @@ class Manga
 
     #[ORM\Column(nullable: true)]
     private ?int $year = null;
+
+    #[ORM\OneToMany(mappedBy: 'manga', targetEntity: Favorite::class, cascade: ['remove'])]
+    private Collection $favorites;
+
+    #[ORM\OneToMany(mappedBy: 'manga', targetEntity: Review::class, cascade: ['remove'])]
+    private Collection $reviews;
+
+    public function __construct()
+    {
+        $this->favorites = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
