@@ -7,6 +7,7 @@ use App\Entity\Anime;
 use App\Entity\User;
 use App\Entity\Contact;
 use App\Entity\Review;
+use App\Entity\Topic;
 use App\Repository\MangaRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -50,6 +51,7 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToCrud('Mangas', 'fas fa-book', Manga::class);
         yield MenuItem::linkToCrud('Animes', 'fas fa-tv', Anime::class);
         yield MenuItem::linkToCrud('Avis', 'fas fa-star', Review::class);
+        yield MenuItem::linkToCrud('Topics', 'fas fa-comments', Topic::class);
         
         yield MenuItem::section('Utilisateurs');
         yield MenuItem::linkToCrud('Utilisateurs', 'fas fa-users', User::class)
