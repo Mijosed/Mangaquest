@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Favoris{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Mes Favoris</h1>
+
+    {% if favorites is empty %}
+        <p class="text-gray-600">Vous n'avez pas encore de favoris.</p>
+    {% else %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for favorite in favorites %}
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    {% if favorite.manga %}
+                        <div class="relative h-48">
+                            <img src="https://uploads.mangadex.org/covers/{{ favorite.manga.mangaDexId }}/{{ favorite.manga.coverImage }}" 
+                                 alt="{{ favorite.manga.title }}"
+                                 class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-4">
+                            <h3 class="text-xl font-semibold mb-2">{{ favorite.manga.title }}</h3>
+                            <a href="{{ path('app_manga_show', {'mangaDexId': favorite.manga.mangaDexId}) }}" 
+                               class="text-blue-500 hover:text-blue-700">
+                                Voir le manga
+                            </a>
+                        </div>
+                    {% endif %}
+
+                    {% if favorite.anime %}
+                        <div class="relative h-48">
+                            <img src="{{ favorite.anime.posterImage }}" 
+                                 alt="{{ favorite.anime.title }}"
+                                 class="w-full h-full object-cover">
+                        </div>
+                        <div class="p-4">
+                            <h3 class="text-xl font-semibold mb-2">{{ favorite.anime.title }}</h3>
+                            <a href="{{ path('app_anime_show', {'id': favorite.anime.id}) }}" 
+                               class="text-blue-500 hover:text-blue-700">
+                                Voir l'anime
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 
