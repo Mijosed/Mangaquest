@@ -78,7 +78,8 @@ class MangaCrudController extends AbstractCrudController
         $basicFields = [
             IdField::new('id')->hideOnForm(),
             TextField::new('mangaDexId', 'MangaDex ID')
-                ->setHelp('Identifiant unique du manga sur MangaDex'),
+                ->setHelp('Identifiant unique du manga sur MangaDex (laissez vide pour création manuelle)')
+                ->setRequired(false),
             TextField::new('title', 'Titre')
                 ->setColumns(12),
             TextEditorField::new('description', 'Description')
@@ -102,11 +103,20 @@ class MangaCrudController extends AbstractCrudController
                 ->setHelp('Année de publication')
         ];
 
-        $coverField = TextField::new('coverImage', 'Couverture')
+        $coverField = ImageField::new('coverImage', 'Couverture')
+            ->setBasePath('uploads/manga/covers')
+            ->setUploadDir('public/uploads/manga/covers')
+            ->setUploadedFileNamePattern('[randomhash].[extension]')
+            ->setFormTypeOptions([
+                'required' => false,
+            ])
             ->setTemplatePath('admin/fields/manga_cover.html.twig')
             ->formatValue(function ($value, $entity) {
                 if (!$value || !$entity instanceof Manga) {
                     return null;
+                }
+                if (str_starts_with($entity->getMangaDexId(), 'manual_')) {
+                    return '/uploads/manga/covers/' . $value;
                 }
                 return sprintf('https://uploads.mangadex.org/covers/%s/%s',
                     $entity->getMangaDexId(),
@@ -116,21 +126,20 @@ class MangaCrudController extends AbstractCrudController
 
         if (Crud::PAGE_INDEX === $pageName) {
             $coverField->setColumns(2);
-            return array_merge([$coverField], $basicFields);
-        }
-
-        if (Crud::PAGE_DETAIL === $pageName) {
+        } elseif (Crud::PAGE_DETAIL === $pageName) {
             $coverField->setColumns(4);
-            return array_merge($basicFields, [$coverField]);
+        } else {
+            $coverField->setColumns(12);
         }
 
-        return array_merge($basicFields, [$coverField->setColumns(12)]);
+        return array_merge($basicFields, [$coverField]);
     }
 
     public function createEntity(string $entityFqcn)
     {
         $manga = new Manga();
         $manga->setStatus('ongoing');
+        $manga->setMangaDexId('manual_' . uniqid());
         return $manga;
     }
-} 
+}
