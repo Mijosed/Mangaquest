@@ -1,22 +1,28 @@
 {# Pour la vue liste #}
 {% if ea.crud.currentAction == 'index' %}
     <div class="manga-cover-thumbnail" style="width: 50px; height: 75px;">
-        <img src="{{ field.formattedValue }}" 
-             alt="{{ field.value }}" 
-             class="img-fluid rounded"
-             style="width: 50px; height: 75px; object-fit: cover;"
-             referrerpolicy="no-referrer">
+        {% if field.value %}
+            <img src="{{ field.formattedValue }}" 
+                 class="img-fluid" 
+                 style="width: 50px; height: 75px; object-fit: cover;" 
+                 referrerpolicy="no-referrer">
+        {% else %}
+            <span class="badge badge-secondary">Pas de couverture</span>
+        {% endif %}
     </div>
 {% else %}
     {# Pour les autres vues #}
     <div class="manga-cover-detail" style="max-width: 120px;">
-        <img src="{{ field.formattedValue }}" 
-             alt="{{ field.value }}" 
-             class="img-fluid rounded"
-             style="max-width: 120px; height: auto;"
-             referrerpolicy="no-referrer">
+        {% if field.value %}
+            <img src="{{ field.formattedValue }}" 
+                 class="img-fluid" 
+                 style="max-width: 120px; height: auto;" 
+                 referrerpolicy="no-referrer">
+        {% else %}
+            <span class="badge badge-secondary">Pas de couverture</span>
+        {% endif %}
         <div class="field-image-value mt-2">
             <code>{{ field.value }}</code>
         </div>
     </div>
-{% endif %} 
+{% endif %}

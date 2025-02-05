@@ -33,10 +33,16 @@
             {# Image de couverture #}
             <div class="md:w-1/3 p-6">
                 {% if localManga.coverImage %}
-                    <img src="https://uploads.mangadex.org/covers/{{ manga.id }}/{{ localManga.coverImage }}"
-                         alt="{{ manga.attributes.title.en }}"
-                         class="w-full rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
-                         referrerpolicy="no-referrer">
+                    {% if localManga.mangaDexId starts with 'manual_' %}
+                        <img src="{{ asset('uploads/manga/covers/' ~ localManga.coverImage) }}"
+                             alt="{{ manga.attributes.title.en }}"
+                             class="w-full rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+                    {% else %}
+                        <img src="https://uploads.mangadex.org/covers/{{ manga.id }}/{{ localManga.coverImage }}"
+                             alt="{{ manga.attributes.title.en }}"
+                             class="w-full rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300"
+                             referrerpolicy="no-referrer">
+                    {% endif %}
                 {% endif %}
             </div>
 
@@ -178,4 +184,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}
