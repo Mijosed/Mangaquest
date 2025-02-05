@@ -2,30 +2,18 @@
 
 namespace App\Entity;
 
-use App\Repository\ReviewRepository;
-use Doctrine\DBAL\Types\Types;
+use App\Repository\FavoriteRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: ReviewRepository::class)]
-class Review
+#[ORM\Entity(repositoryClass: FavoriteRepository::class)]
+class Favorite
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $comment = null;
-
-    #[ORM\Column]
-    #[Assert\Range(min: 0, max: 10)]
-    private ?int $rating = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\ManyToOne(inversedBy: 'reviews')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
@@ -35,6 +23,9 @@ class Review
     #[ORM\ManyToOne]
     private ?Anime $anime = null;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -43,33 +34,6 @@ class Review
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getComment(): ?string
-    {
-        return $this->comment;
-    }
-
-    public function setComment(?string $comment): static
-    {
-        $this->comment = $comment;
-        return $this;
-    }
-
-    public function getRating(): ?int
-    {
-        return $this->rating;
-    }
-
-    public function setRating(int $rating): static
-    {
-        $this->rating = $rating;
-        return $this;
-    }
-
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
     }
 
     public function getUser(): ?User
@@ -104,4 +68,15 @@ class Review
         $this->anime = $anime;
         return $this;
     }
-}
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+} 

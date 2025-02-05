@@ -18,5 +18,10 @@
     </main>
     <!-- Footer -->
     {% include 'parts/footer.html.twig' %}
+
+    <!-- JavaScript -->
+    {% block javascripts %}
+        <script src="{{ asset('js/favorites.js') }}"></script>
+    {% endblock %}
 </body>
 </html>

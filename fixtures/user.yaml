@@ -1,19 +1,19 @@
 App\Entity\User:
   user_template (template):
-    email: "<email()>"
-    plainPassword: "test"
+    email: '<email()>'
+    plainPassword: 'test'
     avatar: '<imageUrl(400, 400, "people")>'
 
   user_admin (extends user_template):
-    email: "admin@gmail.com"
-    roles: ["ROLE_ADMIN"]
-
+    email: 'admin@gmail.com'
+    roles: ['ROLE_ADMIN']
+  
   user_user (extends user_template):
-    email: "user@gmail.com"
-    roles: ["ROLE_USER"]
+    email: 'user@gmail.com'
+    roles: ['ROLE_USER']
 
   user_banned (extends user_template):
-    email: "banned@gmail.com"
-    roles: ["ROLE_BANNED"]
+    email: 'banned@gmail.com'
+    roles: ['ROLE_BANNED']
 
   user {1..5} (extends user_template):
