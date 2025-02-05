@@ -47,7 +47,7 @@ class TopicType extends AbstractType
                     'placeholder' => 'Précisez le contenu du spoiler'
                 ]
             ])
-            ->add('imageFile', FileType::class, [
+            ->add('image', FileType::class, [
                 'label' => 'Image principale',
                 'mapped' => false,
                 'required' => false,

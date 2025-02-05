@@ -50,8 +50,8 @@ class ForumController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile|null $imageFile */
-            $imageFile = $form->get('imageFile')->getData();
+            /** @var UploadedFile $imageFile */
+            $imageFile = $form->get('image')->getData();
 
             if ($imageFile) {
                 $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
@@ -63,10 +63,11 @@ class ForumController extends AbstractController
                         $this->getParameter('topics_directory'),
                         $newFilename
                     );
-                    $topic->setImageFilename($newFilename);
                 } catch (FileException $e) {
                     $this->addFlash('error', 'Une erreur est survenue l\'upload de l\'image');
                 }
+
+                $topic->setImageFilename($newFilename);
             }
 
             $topic->setAuthor($this->getUser());
