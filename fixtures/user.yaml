@@ -2,7 +2,7 @@ App\Entity\User:
   user_template (template):
     email: '<email()>'
     plainPassword: 'test'
-    avatar: '<imageUrl(400, 400, "people")>'
+    avatar: 'https://picsum.photos/400/400?random=<numberBetween(1, 100)>'
 
   user_admin (extends user_template):
     email: 'admin@gmail.com'
