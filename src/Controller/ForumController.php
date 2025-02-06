@@ -26,8 +26,7 @@ class ForumController extends AbstractController
 {
     public function __construct(
         private NotificationService $notificationService
-    ) {
-    }
+    ) {}
 
     #[Route('/', name: 'app_forum_index', methods: ['GET'])]
     public function index(TopicRepository $topicRepository): Response
@@ -108,10 +107,6 @@ class ForumController extends AbstractController
             if (!$this->getUser()) {
                 throw $this->createAccessDeniedException('Vous devez être connecté pour voir ce contenu.');
             }
-
-            if (!$this->getUser()->isAdult()) {
-                throw $this->createAccessDeniedException('Ce contenu est réservé aux utilisateurs majeurs.');
-            }
         }
 
         // Incrémenter le compteur de vues
@@ -124,6 +119,12 @@ class ForumController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (!$this->getUser()) {
+                // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
+                $this->addFlash('error', 'Vous devez être connecté pour répondre.');
+                return $this->redirectToRoute('app_login');
+            }
+
             $post->setAuthor($this->getUser());
             $post->setTopic($topic);
             $entityManager->persist($post);
@@ -165,7 +166,7 @@ class ForumController extends AbstractController
     {
         $this->denyAccessUnlessGranted('POST_DELETE', $post);
 
-        if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $post->getId(), $request->request->get('_token'))) {
             $topicId = $post->getTopic()->getId();
             $entityManager->remove($post);
             $entityManager->flush();
