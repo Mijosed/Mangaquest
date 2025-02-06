@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Event{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold text-gray-900">Edit Event</h1>
+                <div class="space-x-4">
+                    <a href="{{ path('app_event_show', {'id': event.id}) }}" class="text-blue-600 hover:text-blue-900">Back to event</a>
+                    <a href="{{ path('app_event_index') }}" class="text-blue-600 hover:text-blue-900">Back to list</a>
+                </div>
+            </div>
+
+            <div class="bg-white shadow-md rounded-lg p-6">
+                {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+                    <div>
+                        {{ form_label(form.title, 'Title', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                        {{ form_widget(form.title, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+                        {{ form_errors(form.title) }}
+                    </div>
+
+                    <div>
+                        {{ form_label(form.date, 'Date', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                        {{ form_widget(form.date, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+                        {{ form_errors(form.date) }}
+                    </div>
+
+                    <div>
+                        {{ form_label(form.location, 'Location', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                        {{ form_widget(form.location, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+                        {{ form_errors(form.location) }}
+                    </div>
+
+                    <div>
+                        {{ form_label(form.description, 'Description', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                        {{ form_widget(form.description, {'attr': {'class': 'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500'}}) }}
+                        {{ form_errors(form.description) }}
+                    </div>
+
+                    <div class="flex justify-end space-x-4">
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            Save Changes
+                        </button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

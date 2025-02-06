@@ -15,15 +15,27 @@ use Doctrine\DBAL\Types\Types;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[ORM\InheritanceType("SINGLE_TABLE")]
+#[ORM\DiscriminatorColumn(name: "type", type: "string")]
+#[ORM\DiscriminatorMap([
+    "user" => User::class,
+    "organizer" => Organizer::class
+])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    protected ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
-    private ?string $email = null;
+    protected ?string $email = null;
+
+    #[ORM\Column(length: 255)]
+    protected ?string $firstName = null;
+
+    #[ORM\Column(length: 255)]
+    protected ?string $lastName = null;
 
     #[ORM\Column]
     private array $roles = [];
@@ -38,6 +50,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $avatar = null;
+
+    #[ORM\ManyToMany(targetEntity: Event::class, mappedBy: 'participants')]
+    private Collection $participatingEvents;
+
+    #[ORM\ManyToMany(targetEntity: Event::class, mappedBy: 'organizers')]
+    private Collection $organizedEvents;
 
     /**
      * @var Collection<int, Community>
@@ -63,12 +81,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $birthDate = null;
 
+    #[ORM\Column(nullable: true)]
+    protected ?bool $isSubscribedToNewsletter = false;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    protected ?string $preferences = null;
+
     public function __construct()
     {
-        $this->roles = ['ROLE_USER'];
+        $this->roles = ['ROLE_USER', 'ROLE_PARTICIPANT'];
         $this->communities = new ArrayCollection();
         $this->topics = new ArrayCollection();
         $this->posts = new ArrayCollection();
+        $this->participatingEvents = new ArrayCollection();
+        $this->organizedEvents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -84,6 +110,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): static
     {
         $this->email = $email;
+        return $this;
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->firstName;
+    }
+
+    public function setFirstName(string $firstName): static
+    {
+        $this->firstName = $firstName;
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->lastName;
+    }
+
+    public function setLastName(string $lastName): static
+    {
+        $this->lastName = $lastName;
         return $this;
     }
 
@@ -281,5 +329,52 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         $age = $this->birthDate->diff(new \DateTime())->y;
         return $age >= 18;
+    }
+
+    public function getParticipantingEvents(): Collection
+    {
+        return $this->participatingEvents;
+    }
+
+    //setter paticipating events
+    public function setParticipatingEvents(Collection $participatingEvents): static
+    {
+        $this->participatingEvents = $participatingEvents;
+        return $this;
+    }
+
+    //organized events
+    public function getOrganizedEvents(): Collection
+    {
+        return $this->organizedEvents;
+    }
+
+    //setter organized events
+    public function setOrganizedEvents(Collection $organizedEvents): static
+    {
+        $this->organizedEvents = $organizedEvents;
+        return $this;
+    }
+
+    public function getIsSubscribedToNewsletter(): ?bool
+    {
+        return $this->isSubscribedToNewsletter;
+    }
+
+    public function setIsSubscribedToNewsletter(?bool $isSubscribedToNewsletter): self
+    {
+        $this->isSubscribedToNewsletter = $isSubscribedToNewsletter;
+        return $this;
+    }
+
+    public function getPreferences(): ?string
+    {
+        return $this->preferences;
+    }
+
+    public function setPreferences(?string $preferences): self
+    {
+        $this->preferences = $preferences;
+        return $this;
     }
 }
