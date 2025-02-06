@@ -42,12 +42,16 @@ class UserTest extends TestCase
 
     public function testRolesManagement(): void
     {
-        $this->assertEquals(['ROLE_USER'], $this->user->getRoles());
+        // Default roles now include ROLE_USER and ROLE_PARTICIPANT
+        $expectedDefaultRoles = ['ROLE_USER', 'ROLE_PARTICIPANT'];
+        $this->assertEquals($expectedDefaultRoles, $this->user->getRoles());
         
         $this->user->setRoles(['ROLE_ADMIN']);
         $roles = $this->user->getRoles();
         
+        // Should contain all roles: ROLE_USER (always added), ROLE_PARTICIPANT (default), and ROLE_ADMIN (explicitly added)
         $this->assertContains('ROLE_USER', $roles);
+        $this->assertContains('ROLE_PARTICIPANT', $roles);
         $this->assertContains('ROLE_ADMIN', $roles);
     }
 
