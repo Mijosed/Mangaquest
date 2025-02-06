@@ -14,18 +14,18 @@
    ```
 3. **Se connecter :**
 
-```bash
-  php bin/console hautelook:fixtures:load
-```
+    ```bash
+    php bin/console hautelook:fixtures:load
+    ```
 
 - Les identifiants de connexion se trouvent dans `fixtures/user.yaml`.
 
-email: 'admin@gmail.com'
-password: 'test'
-email: 'user@gmail.com'
-password: 'test'
-email: 'banned@gmail.com'
-password: 'test'
+    email: 'admin@gmail.com'
+    password: 'test'
+    email: 'user@gmail.com'
+    password: 'test'
+    email: 'banned@gmail.com'
+    password: 'test'
 
 4. **Charger les animes :**
    ```bash
@@ -37,16 +37,19 @@ password: 'test'
     php bin/console app:import-manga
    ```
 
-   6. **Test unitaire**
+6. **Test unitaire**
 
-   ```bash
-   php bin/console phpunit test/Entity/MangaTest
+    ```bash
+    php bin/console phpunit test/Entity/MangaTest
+    ```
 
 
-   ```
 
-   7. **Test fonctionnel**
+7. **Test fonctionnel**
 
-   ```bash
-   php bin/console phpunit test/Controller/SecurityControllerTest
-   ```
+    ```bash
+    php bin/console phpunit test/Controller/SecurityControllerTest
+    ```
+
+8. **Schéma de la base de données**
+![schéma de la base de données](./db.png)
