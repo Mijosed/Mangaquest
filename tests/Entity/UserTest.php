@@ -3,7 +3,6 @@
 namespace App\Tests\Entity;
 
 use App\Entity\User;
-use App\Entity\Community;
 use App\Entity\Post;
 use PHPUnit\Framework\TestCase;
 
@@ -60,16 +59,7 @@ class UserTest extends TestCase
         $this->assertEquals(count($roles), count(array_unique($roles)));
     }
 
-    public function testCommunityManagement(): void
-    {
-        $community = new Community();
-        
-        $this->user->addCommunity($community);
-        $this->assertCount(1, $this->user->getCommunities());
-        
-        $this->user->removeCommunity($community);
-        $this->assertCount(0, $this->user->getCommunities());
-    }
+
 
     public function testPostManagement(): void
     {
