@@ -74,5 +74,52 @@ class UserFixtures extends Fixture
         }
 
         $manager->flush();
+    }// Ajoutez ces méthodes à la fin de votre classe Event
+
+    public static function loadFixtures(ObjectManager $manager, array $users): void
+    {
+        $faker = Factory::create('fr_FR');
+
+        $eventTitles = [
+            'Concert de Jazz',
+            'Exposition d\'Art Moderne',
+            'Marathon de Paris',
+            'Festival de Gastronomie',
+            'Conférence Tech',
+            'Tournoi de Football',
+            'Soirée Théâtre'
+        ];
+
+        $locations = [
+            'Palais des Congrès, Paris',
+            'Stade de France, Saint-Denis',
+            'Zénith de Paris',
+            'Centre Pompidou',
+            'Parc des Princes',
+            'AccorHotels Arena'
+        ];
+
+        foreach ($eventTitles as $index => $title) {
+            $event = new self();
+
+            $event->setTitle($title)
+                ->setDate($faker->dateTimeBetween('now', '+6 months'))
+                ->setLocation($faker->randomElement($locations))
+                ->setDescription($faker->paragraphs(2, true))
+                ->setCreator($users[array_rand($users)]);
+
+            // Ajout de 3 à 8 participants aléatoires
+            $participantsCount = rand(3, 8);
+            $shuffledUsers = $users;
+            shuffle($shuffledUsers);
+
+            for ($i = 0; $i < $participantsCount && $i < count($shuffledUsers); $i++) {
+                $event->addParticipant($shuffledUsers[$i]);
+            }
+
+            $manager->persist($event);
+        }
+
+        $manager->flush();
     }
 }
