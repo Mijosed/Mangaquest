@@ -25,6 +25,9 @@ jobs:
           extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite
           coverage: none
 
+      - name: Copy .env.test
+        run: php -r "file_exists('.env') || copy('.env.test', '.env');"
+
       - name: Install Composer dependencies
         run: |
           composer update --no-interaction --no-progress
@@ -39,6 +42,7 @@ jobs:
         env:
           DATABASE_URL: "sqlite:///%kernel.project_dir%/var/test.db"
           APP_ENV: test
+          KERNEL_CLASS: 'App\Kernel'
         run: |
           php bin/console doctrine:schema:create --env=test
           php bin/phpunit

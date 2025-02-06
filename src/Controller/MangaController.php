@@ -68,8 +68,25 @@ class MangaController extends AbstractController
             throw $this->createNotFoundException('Manga non trouvé');
         }
 
-        $mangaDetails = $this->mangaDexApi->getMangaDetails($mangaDexId);
-        $chapters = $this->mangaDexApi->getMangaChapters($mangaDexId);
+        // Check if it's a manually created manga
+        $isManual = str_starts_with($mangaDexId, 'manual_');
+        
+        if ($isManual) {
+            $mangaDetails = [
+                'id' => $localManga->getMangaDexId(),
+                'attributes' => [
+                    'title' => ['en' => $localManga->getTitle()],
+                    'description' => ['en' => $localManga->getDescription()],
+                    'status' => $localManga->getStatus(),
+                    'year' => $localManga->getYear(),
+                    'tags' => []
+                ]
+            ];
+            $chapters = [];
+        } else {
+            $mangaDetails = $this->mangaDexApi->getMangaDetails($mangaDexId);
+            $chapters = $this->mangaDexApi->getMangaChapters($mangaDexId);
+        }
 
         // Récupérer les reviews existantes
         $reviews = $entityManager->getRepository(Review::class)->findBy(

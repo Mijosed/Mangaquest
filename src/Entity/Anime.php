@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\AnimeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: AnimeRepository::class)]
 class Anime
@@ -34,6 +36,18 @@ class Anime
 
     #[ORM\Column(length: 255)]
     private ?string $posterImage = null;
+
+    #[ORM\OneToMany(mappedBy: 'anime', targetEntity: Favorite::class, cascade: ['remove'])]
+    private Collection $favorites;
+
+    #[ORM\OneToMany(mappedBy: 'anime', targetEntity: Review::class, cascade: ['remove'])]
+    private Collection $reviews;
+
+    public function __construct()
+    {
+        $this->favorites = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -118,7 +132,7 @@ class Anime
     }
 
     public function getYear(): ?int
-{
-    return $this->releaseDate ? (new \DateTime($this->releaseDate))->format('Y') : null;
-}
+    {
+        return $this->releaseDate ? (new \DateTime($this->releaseDate))->format('Y') : null;
+    }
 }
