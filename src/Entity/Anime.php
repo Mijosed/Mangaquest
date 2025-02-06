@@ -19,7 +19,7 @@ class Anime
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: "text", nullable: true)]
     private ?string $description = null;
 
     #[ORM\Column(length: 255)]
