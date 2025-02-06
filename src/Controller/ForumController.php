@@ -18,10 +18,17 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use App\Service\NotificationService;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 #[Route('/forum')]
 class ForumController extends AbstractController
 {
+    public function __construct(
+        private NotificationService $notificationService
+    ) {
+    }
+
     #[Route('/', name: 'app_forum_index', methods: ['GET'])]
     public function index(TopicRepository $topicRepository): Response
     {
@@ -50,8 +57,8 @@ class ForumController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile|null $imageFile */
-            $imageFile = $form->get('imageFile')->getData();
+            /** @var UploadedFile $imageFile */
+            $imageFile = $form->get('image')->getData();
 
             if ($imageFile) {
                 $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
@@ -63,10 +70,11 @@ class ForumController extends AbstractController
                         $this->getParameter('topics_directory'),
                         $newFilename
                     );
-                    $topic->setImageFilename($newFilename);
                 } catch (FileException $e) {
                     $this->addFlash('error', 'Une erreur est survenue l\'upload de l\'image');
                 }
+
+                $topic->setImageFilename($newFilename);
             }
 
             $topic->setAuthor($this->getUser());
@@ -75,6 +83,7 @@ class ForumController extends AbstractController
             $entityManager->flush();
 
             if (!$topic->isApproved()) {
+                $this->notificationService->notifyAdminsNewTopic($topic);
                 $this->addFlash('info', 'Votre sujet a été soumis et sera visible après validation par un administrateur.');
                 return $this->redirectToRoute('app_forum_index');
             }
@@ -127,5 +136,44 @@ class ForumController extends AbstractController
             'topic' => $topic,
             'form' => $form
         ]);
+    }
+
+    #[Route('/post/{id}/edit', name: 'app_post_edit')]
+    public function editPost(Post $post, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        // Vérifie si l'utilisateur peut modifier ce post
+        $this->denyAccessUnlessGranted('POST_EDIT', $post);
+
+        $form = $this->createForm(PostType::class, $post);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Votre réponse a été modifiée avec succès.');
+            return $this->redirectToRoute('app_forum_show', ['id' => $post->getTopic()->getId()]);
+        }
+
+        return $this->render('forum/edit_post.html.twig', [
+            'form' => $form,
+            'post' => $post
+        ]);
+    }
+
+    #[Route('/post/{id}/delete', name: 'app_post_delete', methods: ['POST'])]
+    public function deletePost(Post $post, Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $this->denyAccessUnlessGranted('POST_DELETE', $post);
+
+        if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('_token'))) {
+            $topicId = $post->getTopic()->getId();
+            $entityManager->remove($post);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Votre réponse a été supprimée.');
+            return $this->redirectToRoute('app_forum_show', ['id' => $topicId]);
+        }
+
+        throw new AccessDeniedException('Token CSRF invalide.');
     }
 }
