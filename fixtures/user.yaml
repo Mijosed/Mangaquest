@@ -1,5 +1,7 @@
 App\Entity\User:
   user_template (template):
+    firstName: '<firstName()>'
+    lastName: '<lastName()>'
     email: '<email()>'
     plainPassword: 'test'
     avatar: 'https://picsum.photos/400/400?random=<numberBetween(1, 100)>'
@@ -16,4 +18,14 @@ App\Entity\User:
     email: 'banned@gmail.com'
     roles: ['ROLE_BANNED']
 
+  user_user_1 (extends user_template):
+    email: 'user1@gmail.com'
+    roles: ['ROLE_USER']
+  
+  user_user_2 (extends user_template):
+    email: 'user2@gmail.com'
+    roles: ['ROLE_USER']
+
   user {1..5} (extends user_template):
+
+ 

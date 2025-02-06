@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Event Details{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold text-gray-900">Event Details</h1>
+                <a href="{{ path('app_event_index') }}" class="text-blue-600 hover:text-blue-900">Back to list</a>
+            </div>
+
+            <div class="bg-white shadow-md rounded-lg p-6">
+                <div class="space-y-4">
+                    <div>
+                        <h2 class="text-lg font-medium text-gray-900">{{ event.title }}</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Date</p>
+                            <p class="mt-1">{{ event.date|date('Y-m-d H:i:s') }}</p>
+                        </div>
+                        
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Location</p>
+                            <p class="mt-1">{{ event.location }}</p>
+                        </div>
+                    </div>
+
+                    {% if event.description %}
+                        <div>
+                            <p class="text-sm font-medium text-gray-500">Description</p>
+                            <p class="mt-1">{{ event.description }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mt-6 flex justify-between items-center">
+                    <div class="space-x-4">
+                        {% if is_granted('edit', event) %}
+                            <a href="{{ path('app_event_edit', {'id': event.id}) }}" 
+                               class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                Edit
+                            </a>
+                        {% endif %}
+                        
+                        {% if is_granted('delete', event) %}
+                            <form method="post" action="{{ path('app_event_delete', {'id': event.id}) }}" class="inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
+                                <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                                    Delete
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+
+                    {% if app.user and is_granted('participate', event) %}
+                        <form method="post" action="{{ path('app_event_participate', {'id': event.id}) }}">
+                            <button type="submit" 
+                                    class="{% if event.hasParticipant(app.user) %}
+                                        bg-red-500 hover:bg-red-700
+                                    {% else %}
+                                        bg-green-500 hover:bg-green-700
+                                    {% endif %} text-white font-bold py-2 px-4 rounded">
+                                {{ event.hasParticipant(app.user) ? 'Cancel Participation' : 'Participate' }}
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+
+                <div class="mt-8">
+                    <h3 class="text-xl font-semibold mb-4">Participants ({{ event.participants|length }})</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {% for participant in event.participants %}
+                            <div class="bg-gray-100 rounded p-3 flex items-center">
+                                {% if participant.avatar %}
+                                    <img src="{{ asset(participant.avatar) }}" 
+                                         alt="{{ participant.firstName }}" 
+                                         class="w-10 h-10 rounded-full mr-2">
+                                {% endif %}
+                                <span>{{ participant.firstName }} {{ participant.lastName }}</span>
+                            </div>
+                        {% else %}
+                            <p class="text-gray-500">No participants yet</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
