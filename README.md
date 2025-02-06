@@ -1,21 +1,28 @@
 # Mangaquest
 
 ## Étapes d'installation
-
 1. **Installer les dépendances :**
+
+   ```bash
+   cp .envCopy .env
+   ```
+
+
+
+2. **Installer les dépendances :**
 
    ```bash
    composer install
    ```
 
-2. **Démarrer le serveur Symfony :**
+3. **Démarrer le serveur Symfony :**
    ```bash
    symfony serve
    ```
-3. **Se connecter :**
+4. **Se connecter :**
 
     ```bash
-    php bin/console hautelook:fixtures:load
+    php bin/console doctrine:fixtures:load
     ```
 
 - Les identifiants de connexion se trouvent dans `fixtures/user.yaml`.
@@ -27,17 +34,17 @@
     email: 'banned@gmail.com'
     password: 'test'
 
-4. **Charger les animes :**
+5. **Charger les animes :**
    ```bash
     php bin/console app:fetch-anime
    ```
-5. **Charger les mangas :**
+6. **Charger les mangas :**
 
    ```bash
     php bin/console app:import-manga
    ```
 
-6. **Test unitaire**
+7. **Test unitaire**
 
     ```bash
     php bin/console phpunit test/Entity/MangaTest
@@ -45,11 +52,11 @@
 
 
 
-7. **Test fonctionnel**
+8. **Test fonctionnel**
 
     ```bash
     php bin/console phpunit test/Controller/SecurityControllerTest
     ```
 
-8. **Schéma de la base de données**
+9. **Schéma de la base de données**
 ![schéma de la base de données](./db.png)
