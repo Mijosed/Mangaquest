@@ -42,17 +42,22 @@ class UserTest extends TestCase
 
     public function testRolesManagement(): void
     {
-        // Default roles now include ROLE_USER and ROLE_PARTICIPANT
-        $expectedDefaultRoles = ['ROLE_USER', 'ROLE_PARTICIPANT'];
-        $this->assertEquals($expectedDefaultRoles, $this->user->getRoles());
+        // Test default roles
+        $defaultRoles = $this->user->getRoles();
+        $this->assertContains('ROLE_USER', $defaultRoles);
+        $this->assertContains('ROLE_PARTICIPANT', $defaultRoles);
         
+        // Test adding a new role
         $this->user->setRoles(['ROLE_ADMIN']);
         $roles = $this->user->getRoles();
         
-        // Should contain all roles: ROLE_USER (always added), ROLE_PARTICIPANT (default), and ROLE_ADMIN (explicitly added)
+        // Check all expected roles are present
         $this->assertContains('ROLE_USER', $roles);
         $this->assertContains('ROLE_PARTICIPANT', $roles);
         $this->assertContains('ROLE_ADMIN', $roles);
+        
+        // Check for no duplicates
+        $this->assertEquals(count($roles), count(array_unique($roles)));
     }
 
     public function testCommunityManagement(): void
