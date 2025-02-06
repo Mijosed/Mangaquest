@@ -57,11 +57,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Event::class, mappedBy: 'organizers')]
     private Collection $organizedEvents;
 
-    /**
-     * @var Collection<int, Community>
-     */
-    #[ORM\OneToMany(targetEntity: Community::class, mappedBy: 'creator')]
-    private Collection $communities;
 
     /**
      * @var Collection<int, Topic>
@@ -90,7 +85,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->roles = ['ROLE_USER', 'ROLE_PARTICIPANT'];
-        $this->communities = new ArrayCollection();
         $this->topics = new ArrayCollection();
         $this->posts = new ArrayCollection();
         $this->participatingEvents = new ArrayCollection();
@@ -209,36 +203,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setAvatar(?string $avatar): static
     {
         $this->avatar = $avatar;
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Community>
-     */
-    public function getCommunities(): Collection
-    {
-        return $this->communities;
-    }
-
-    public function addCommunity(Community $community): static
-    {
-        if (!$this->communities->contains($community)) {
-            $this->communities->add($community);
-            $community->setCreator($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCommunity(Community $community): static
-    {
-        if ($this->communities->removeElement($community)) {
-            // set the owning side to null (unless already changed)
-            if ($community->getCreator() === $this) {
-                $community->setCreator(null);
-            }
-        }
-
         return $this;
     }
 
