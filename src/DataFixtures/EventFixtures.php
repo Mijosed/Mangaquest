@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Event;
+use App\Entity\Organizer;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -15,13 +16,13 @@ class EventFixtures extends Fixture implements DependentFixtureInterface
         $faker = Factory::create('fr_FR');
 
         $eventTitles = [
-            'Concert de Jazz',
-            'Exposition d\'Art Moderne',
-            'Marathon de Paris',
-            'Festival de Gastronomie',
-            'Conférence Tech',
-            'Tournoi de Football',
-            'Soirée Théâtre'
+            'Concert de Jazz' => ['music', 'culture'],
+            'Exposition d\'Art Moderne' => ['culture', 'art'],
+            'Marathon de Paris' => ['sport', 'outdoor'],
+            'Festival de Gastronomie' => ['food', 'culture'],
+            'Conférence Tech' => ['technology', 'business'],
+            'Tournoi de Football' => ['sport', 'outdoor'],
+            'Soirée Théâtre' => ['culture', 'art']
         ];
 
         $locations = [
@@ -42,7 +43,31 @@ class EventFixtures extends Fixture implements DependentFixtureInterface
             $users[] = $this->getReference('user_random_' . $i);
         }
 
-        foreach ($eventTitles as $title) {
+        // Création des organisateurs
+        $organizers = [];
+        $organizations = [
+            'EventPro Paris',
+            'Sport & Culture Organisation',
+            'Tech Conference France',
+            'Arts et Spectacles Production',
+            'Festival Management'
+        ];
+
+        for ($i = 0; $i < 5; $i++) {
+            $organizer = new Organizer();
+            $organizer->setEmail($faker->email())
+                ->setFirstName($faker->firstName())
+                ->setLastName($faker->lastName())
+                ->setPassword('password123')
+                ->setOrganization($organizations[$i])
+                ->setPhone($faker->phoneNumber())
+                ->setBirthDate($faker->dateTimeBetween('-50 years', '-25 years'));
+
+            $manager->persist($organizer);
+            $organizers[] = $organizer;
+        }
+
+        foreach ($eventTitles as $title => $categories) {
             $event = new Event();
 
             $event->setTitle($title)
@@ -58,6 +83,15 @@ class EventFixtures extends Fixture implements DependentFixtureInterface
 
             for ($i = 0; $i < $participantsCount && $i < count($shuffledUsers); $i++) {
                 $event->addParticipant($shuffledUsers[$i]);
+            }
+
+            // Ajout de 1 à 2 organisateurs aléatoires
+            $organizersCount = rand(1, 2);
+            $shuffledOrganizers = $organizers;
+            shuffle($shuffledOrganizers);
+
+            for ($i = 0; $i < $organizersCount; $i++) {
+                $event->addOrganizer($shuffledOrganizers[$i]);
             }
 
             $manager->persist($event);
