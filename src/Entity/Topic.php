@@ -9,6 +9,13 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TopicRepository::class)]
+#[ORM\InheritanceType("JOINED")]
+#[ORM\DiscriminatorColumn(name: "topic_type", type: "string")]
+#[ORM\DiscriminatorMap([
+    "topic" => Topic::class,
+    "manga" => MangaTopic::class,
+    "anime" => AnimeTopic::class
+])]
 class Topic
 {
     #[ORM\Id]
@@ -201,6 +208,11 @@ class Topic
     public function getImageUrl(): ?string
     {
         return $this->imageFilename ? '/uploads/topics/' . $this->imageFilename : null;
+    }
+
+    public function getType(): string
+    {
+        return 'topic';
     }
 
     // Getters et Setters...

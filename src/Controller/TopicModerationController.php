@@ -27,9 +27,6 @@ class TopicModerationController extends AbstractController
     public function approveTopic(Topic $topic, Request $request, EntityManagerInterface $entityManager): Response
     {
         $topic->setIsApproved(true);
-        $topic->setHasSpoiler($request->request->getBoolean('hasSpoiler'));
-        $topic->setSpoilerWarning($request->request->get('spoilerWarning'));
-        
         $entityManager->flush();
 
         $this->addFlash('success', 'Le sujet a été approuvé.');

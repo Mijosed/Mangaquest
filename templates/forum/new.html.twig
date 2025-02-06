@@ -1,6 +1,15 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouveau sujet - Forum MangaQuest{% endblock %}
+{% block title %}
+    {% if type == 'manga' %}
+        Nouveau sujet Manga
+    {% elseif type == 'anime' %}
+        Nouveau sujet Anime
+    {% else %}
+        Nouveau sujet général
+    {% endif %}
+    - Forum MangaQuest
+{% endblock %}
 
 {% block content %}
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -10,7 +19,15 @@
                     ← Retour au forum
                 </a>
             </div>
-            <h1 class="text-3xl font-bold text-gray-900">Créer un nouveau sujet</h1>
+            <h1 class="text-3xl font-bold text-gray-900">
+                {% if type == 'manga' %}
+                    Créer un nouveau sujet Manga
+                {% elseif type == 'anime' %}
+                    Créer un nouveau sujet Anime
+                {% else %}
+                    Créer un nouveau sujet général
+                {% endif %}
+            </h1>
         </div>
 
         {{ form_start(form, {'attr': {'class': 'space-y-6 bg-white shadow-sm rounded-lg p-6'}}) }}

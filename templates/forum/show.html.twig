@@ -42,6 +42,21 @@
                         </div>
                     </div>
                 </div>
+                <div class="mb-4">
+                    {% if topic.type == 'manga' %}
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <p class="text-sm text-blue-700">
+                                Manga : {{ topic.mangaTitle }} - Chapitre {{ topic.chapter }}
+                            </p>
+                        </div>
+                    {% elseif topic.type == 'anime' %}
+                        <div class="bg-purple-50 p-4 rounded-lg">
+                            <p class="text-sm text-purple-700">
+                                Anime : {{ topic.animeTitle }} - Épisode {{ topic.episode }}
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
