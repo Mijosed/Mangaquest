@@ -20,34 +20,143 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Service\NotificationService;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use App\Entity\MangaTopic;
+use App\Form\MangaTopicType;
+use App\Entity\AnimeTopic;
+use App\Form\AnimeTopicType;
 
 #[Route('/forum')]
 class ForumController extends AbstractController
 {
     public function __construct(
         private NotificationService $notificationService
-    ) {
-    }
+    ) {}
 
     #[Route('/', name: 'app_forum_index', methods: ['GET'])]
-    public function index(TopicRepository $topicRepository): Response
+    public function index(Request $request, TopicRepository $topicRepository): Response
     {
-        $criteria = ['isApproved' => true];
+        $filters = [
+            'type' => $request->query->get('type'),
+            'date' => $request->query->get('date'),
+            'sort' => $request->query->get('sort', 'createdAt'),
+            'order' => $request->query->get('order', 'DESC'),
+        ];
 
-        // Si l'utilisateur n'est pas connecté ou n'est pas majeur, on exclut les topics NSFW
+        // Gestion du NSFW
         if (!$this->getUser() || !$this->getUser()->isAdult()) {
-            $criteria['isNsfw'] = false;
+            $filters['nsfw'] = false;
         }
 
+        $page = $request->query->getInt('page', 1);
+        $result = $topicRepository->findFilteredTopics($filters, $page);
+
         return $this->render('forum/index.html.twig', [
-            'topics' => $topicRepository->findBy($criteria, ['createdAt' => 'DESC']),
-            'popular_topics' => $topicRepository->findBy($criteria, ['views' => 'DESC'], 5)
+            'topics' => $result['topics'],
+            'currentPage' => $result['currentPage'],
+            'lastPage' => $result['lastPage'],
+            'totalTopics' => $result['totalItems'],
+            'filters' => $filters,
+            'popular_topics' => $topicRepository->findBy(['isApproved' => true], ['views' => 'DESC'], 5)
         ]);
     }
 
-    #[Route('/new', name: 'app_forum_new', methods: ['GET', 'POST'])]
+    #[Route('/new/manga', name: 'app_forum_new_manga')]
     #[IsGranted('ROLE_USER')]
-    public function new(
+    public function newMangaTopic(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        SluggerInterface $slugger
+    ): Response {
+        $topic = new MangaTopic();
+        $form = $this->createForm(MangaTopicType::class, $topic);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $imageFile */
+            $imageFile = $form->get('image')->getData();
+
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+                try {
+                    $imageFile->move(
+                        $this->getParameter('topics_directory'),
+                        $newFilename
+                    );
+                    $topic->setImageFilename($newFilename);
+                } catch (FileException $e) {
+                    $this->addFlash('danger', 'Une erreur est survenue lors de l\'upload de l\'image');
+                }
+            }
+
+            $topic->setAuthor($this->getUser());
+            $topic->setIsApproved(false);
+            $entityManager->persist($topic);
+            $entityManager->flush();
+
+            $this->notificationService->notifyAdminsNewTopic($topic);
+            $this->addFlash('info', 'Votre sujet manga a été soumis et sera visible après validation par un administrateur.');
+            return $this->redirectToRoute('app_forum_index');
+        }
+
+        return $this->render('forum/new.html.twig', [
+            'form' => $form,
+            'type' => 'manga'
+        ]);
+    }
+
+    #[Route('/new/anime', name: 'app_forum_new_anime')]
+    #[IsGranted('ROLE_USER')]
+    public function newAnimeTopic(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        SluggerInterface $slugger
+    ): Response {
+        $topic = new AnimeTopic();
+        $form = $this->createForm(AnimeTopicType::class, $topic);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile $imageFile */
+            $imageFile = $form->get('image')->getData();
+
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+                try {
+                    $imageFile->move(
+                        $this->getParameter('topics_directory'),
+                        $newFilename
+                    );
+                    $topic->setImageFilename($newFilename);
+                } catch (FileException $e) {
+                    $this->addFlash('danger', 'Une erreur est survenue lors de l\'upload de l\'image');
+                }
+            }
+
+            $topic->setAuthor($this->getUser());
+            $topic->setIsApproved(false);
+            $entityManager->persist($topic);
+            $entityManager->flush();
+
+            $this->notificationService->notifyAdminsNewTopic($topic);
+            $this->addFlash('info', 'Votre sujet anime a été soumis et sera visible après validation par un administrateur.');
+            return $this->redirectToRoute('app_forum_index');
+        }
+
+        return $this->render('forum/new.html.twig', [
+            'form' => $form,
+            'type' => 'anime'
+        ]);
+    }
+
+    #[Route('/new/topic', name: 'app_forum_new_topic')]
+    #[IsGranted('ROLE_USER')]
+    public function newTopic(
         Request $request,
         EntityManagerInterface $entityManager,
         SluggerInterface $slugger
@@ -70,29 +179,25 @@ class ForumController extends AbstractController
                         $this->getParameter('topics_directory'),
                         $newFilename
                     );
+                    $topic->setImageFilename($newFilename);
                 } catch (FileException $e) {
-                    $this->addFlash('error', 'Une erreur est survenue l\'upload de l\'image');
+                    $this->addFlash('danger', 'Une erreur est survenue lors de l\'upload de l\'image');
                 }
-
-                $topic->setImageFilename($newFilename);
             }
 
             $topic->setAuthor($this->getUser());
-            $topic->setIsApproved($this->isGranted('ROLE_ADMIN')); // Auto-approuvé si admin
+            $topic->setIsApproved(false);
             $entityManager->persist($topic);
             $entityManager->flush();
 
-            if (!$topic->isApproved()) {
-                $this->notificationService->notifyAdminsNewTopic($topic);
-                $this->addFlash('info', 'Votre sujet a été soumis et sera visible après validation par un administrateur.');
-                return $this->redirectToRoute('app_forum_index');
-            }
-
-            return $this->redirectToRoute('app_forum_show', ['id' => $topic->getId()]);
+            $this->notificationService->notifyAdminsNewTopic($topic);
+            $this->addFlash('info', 'Votre sujet a été soumis et sera visible après validation par un administrateur.');
+            return $this->redirectToRoute('app_forum_index');
         }
 
         return $this->render('forum/new.html.twig', [
-            'form' => $form
+            'form' => $form,
+            'type' => 'general'
         ]);
     }
 
@@ -108,10 +213,6 @@ class ForumController extends AbstractController
             if (!$this->getUser()) {
                 throw $this->createAccessDeniedException('Vous devez être connecté pour voir ce contenu.');
             }
-
-            if (!$this->getUser()->isAdult()) {
-                throw $this->createAccessDeniedException('Ce contenu est réservé aux utilisateurs majeurs.');
-            }
         }
 
         // Incrémenter le compteur de vues
@@ -124,6 +225,12 @@ class ForumController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (!$this->getUser()) {
+                // Utiliser 'danger' au lieu de 'error'
+                $this->addFlash('danger', 'Vous devez être connecté pour répondre.');
+                return $this->redirectToRoute('app_login');
+            }
+
             $post->setAuthor($this->getUser());
             $post->setTopic($topic);
             $entityManager->persist($post);
@@ -165,7 +272,7 @@ class ForumController extends AbstractController
     {
         $this->denyAccessUnlessGranted('POST_DELETE', $post);
 
-        if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $post->getId(), $request->request->get('_token'))) {
             $topicId = $post->getTopic()->getId();
             $entityManager->remove($post);
             $entityManager->flush();

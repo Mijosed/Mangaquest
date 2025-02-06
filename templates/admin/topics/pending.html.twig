@@ -3,47 +3,34 @@
 {% block title %}Topics en attente de validation{% endblock %}
 
 {% block content %}
-    <div class="container my-4">
-        <h1>Topics en attente de validation</h1>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">Topics en attente de validation</h1>
 
-        {% for topic in topics %}
-            <div class="card mb-3">
-                <div class="card-header">
-                    <h2 class="h5 mb-0">{{ topic.title }}</h2>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <small class="text-muted">
-                            Par {{ topic.author.email }} le {{ topic.createdAt|date('d/m/Y H:i') }}
-                        </small>
+        <div class="space-y-6">
+            {% for topic in topics %}
+                <div class="bg-white shadow rounded-lg p-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900">{{ topic.title }}</h2>
+                            <p class="text-sm text-gray-500">
+                                Par {{ topic.author.email }} le {{ topic.createdAt|date('d/m/Y H:i') }}
+                            </p>
+                        </div>
+                        <form method="post" action="{{ path('app_admin_topic_approve', {'id': topic.id}) }}">
+                            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+                                Approuver
+                            </button>
+                        </form>
                     </div>
-                    <div class="topic-content mb-3">
-                        {{ topic.content|nl2br }}
+                    <div class="mt-4 prose max-w-none">
+                        {{ topic.content|raw }}
                     </div>
-                    <form method="post" action="{{ path('app_admin_topic_approve', {'id': topic.id}) }}" class="mb-3">
-                        <div class="form-check mb-2">
-                            <input type="checkbox" class="form-check-input" id="hasSpoiler_{{ topic.id }}" name="hasSpoiler" {% if topic.hasSpoiler %}checked{% endif %}>
-                            <label class="form-check-label" for="hasSpoiler_{{ topic.id }}">Contient des spoilers</label>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Avertissement spoiler</label>
-                            <input type="text" class="form-control" name="spoilerWarning" value="{{ topic.spoilerWarning }}" placeholder="Ex: Spoiler sur la saison 2 de One Piece">
-                        </div>
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-success">Approuver</button>
-                            <a href="{{ path('app_admin_topic_reject', {'id': topic.id}) }}" 
-                               class="btn btn-danger"
-                               onclick="return confirm('Êtes-vous sûr de vouloir rejeter ce sujet ?')">
-                                Rejeter
-                            </a>
-                        </div>
-                    </form>
                 </div>
-            </div>
-        {% else %}
-            <div class="alert alert-info">
-                Aucun topic en attente de validation.
-            </div>
-        {% endfor %}
+            {% else %}
+                <div class="bg-gray-50 p-4 rounded-lg">
+                    <p class="text-gray-600">Aucun topic en attente de validation.</p>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 {% endblock %} 

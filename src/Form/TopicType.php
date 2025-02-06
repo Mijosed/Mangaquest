@@ -48,9 +48,9 @@ class TopicType extends AbstractType
                 ]
             ])
             ->add('image', FileType::class, [
-                'label' => 'Image principale',
-                'mapped' => false,
+                'label' => 'Image (optionnelle)',
                 'required' => false,
+                'mapped' => false,
                 'constraints' => [
                     new File([
                         'maxSize' => '2M',
