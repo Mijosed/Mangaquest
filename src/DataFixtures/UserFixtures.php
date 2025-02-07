@@ -19,6 +19,15 @@ class UserFixtures extends Fixture
         $this->passwordHasher = $passwordHasher;
     }
 
+    private function getRandomAvatar(): string
+    {
+        static $count = 0;
+        $count++;
+        
+        // Utiliser un seed incrémental au lieu d'un aléatoire pour garantir des avatars uniques
+        return "https://api.dicebear.com/7.x/avataaars/svg?seed=avatar{$count}";
+    }
+
     public function load(ObjectManager $manager): void
     {
         // Création des utilisateurs spécifiques
@@ -49,7 +58,7 @@ class UserFixtures extends Fixture
                 ->setBirthDate($this->faker->dateTimeBetween('-50 years', '-18 years'))
                 ->setIsSubscribedToNewsletter($this->faker->boolean())
                 ->setPreferences($this->faker->randomElement(['sport', 'culture', 'music', 'technology']))
-                ->setAvatar($this->faker->imageUrl(640, 480, 'people'));
+                ->setAvatar($this->getRandomAvatar());
 
             $manager->persist($user);
             $this->addReference('user_' . $userData['email'], $user);
@@ -67,14 +76,14 @@ class UserFixtures extends Fixture
                 ->setBirthDate($this->faker->dateTimeBetween('-50 years', '-18 years'))
                 ->setIsSubscribedToNewsletter($this->faker->boolean())
                 ->setPreferences($this->faker->randomElement(['sport', 'culture', 'music', 'technology']))
-                ->setAvatar($this->faker->imageUrl(640, 480, 'people'));
+                ->setAvatar($this->getRandomAvatar());
 
             $manager->persist($user);
             $this->addReference('user_random_' . $i, $user);
         }
 
         $manager->flush();
-    }// Ajoutez ces méthodes à la fin de votre classe Event
+    }
 
     public static function loadFixtures(ObjectManager $manager, array $users): void
     {

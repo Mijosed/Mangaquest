@@ -197,6 +197,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getAvatar(): ?string
     {
+        if ($this->avatar === null) {
+            // Générer un avatar par défaut basé sur l'id de l'utilisateur
+            return "https://api.dicebear.com/7.x/avataaars/svg?seed=user" . $this->getId();
+        }
         return $this->avatar;
     }
 
