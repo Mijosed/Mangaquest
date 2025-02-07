@@ -50,6 +50,7 @@ Avant d'installer MangaQuest, assurez-vous d'avoir :
 
 ### 🔍 Tests unitaires
 ```bash
+php bin/console phpunit test/Entity/UserTest
 php bin/console phpunit test/Entity/MangaTest
 ```
 
