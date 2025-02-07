@@ -2,6 +2,10 @@
 
 Bienvenue sur **MangaQuest**, une plateforme permettant aux utilisateurs de découvrir et d'interagir avec des mangas et des animes. 
 
+## 🛠️ Cahier des charges
+
+![Cahier des charges](./CDC.md)
+
 ## ⚙️ Prérequis
 
 Avant d'installer MangaQuest, assurez-vous d'avoir :
@@ -31,7 +35,7 @@ Avant d'installer MangaQuest, assurez-vous d'avoir :
    ```bash
    php bin/console doctrine:fixtures:load
    ```
-   Les identifiants de connexion se trouvent dans `fixtures/user.yaml` :
+   Les identifiants de connexion pour tester les différents roles :
    - ✉️ `admin@gmail.com` | 🔑 `test`
    - ✉️ `user@gmail.com` | 🔑 `test`
    - ✉️ `banned@gmail.com` | 🔑 `test`

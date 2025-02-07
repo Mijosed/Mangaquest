@@ -7,9 +7,7 @@ namespace DoctrineMigrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-/**
- * Auto-generated Migration: Please modify to your needs!
- */
+
 final class Version20250206201121 extends AbstractMigration
 {
     public function getDescription(): string
@@ -19,7 +17,7 @@ final class Version20250206201121 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
+        
         $this->addSql('CREATE TABLE anime_topic (id INT NOT NULL, anime_title VARCHAR(255) NOT NULL, episode VARCHAR(50) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE manga_topic (id INT NOT NULL, manga_title VARCHAR(255) NOT NULL, chapter VARCHAR(50) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('ALTER TABLE anime_topic ADD CONSTRAINT FK_F1E9BE24BF396750 FOREIGN KEY (id) REFERENCES topic (id) ON DELETE CASCADE');
@@ -36,7 +34,7 @@ final class Version20250206201121 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        // this down() migration is auto-generated, please modify it to your needs
+        
         $this->addSql('ALTER TABLE anime_topic DROP FOREIGN KEY FK_F1E9BE24BF396750');
         $this->addSql('ALTER TABLE manga_topic DROP FOREIGN KEY FK_B16227CBF396750');
         $this->addSql('DROP TABLE anime_topic');
