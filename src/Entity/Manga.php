@@ -37,7 +37,7 @@ class Manga
     #[ORM\OneToMany(mappedBy: 'manga', targetEntity: Favorite::class, cascade: ['remove'])]
     private Collection $favorites;
 
-    #[ORM\OneToMany(mappedBy: 'manga', targetEntity: Review::class, cascade: ['remove'])]
+    #[ORM\OneToMany(mappedBy: 'manga', targetEntity: Review::class, orphanRemoval: true)]
     private Collection $reviews;
 
     public function __construct()
@@ -114,6 +114,33 @@ class Manga
     public function setYear(?int $year): static
     {
         $this->year = $year;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
+    }
+
+    public function addReview(Review $review): static
+    {
+        if (!$this->reviews->contains($review)) {
+            $this->reviews->add($review);
+            $review->setManga($this);
+        }
+        return $this;
+    }
+
+    public function removeReview(Review $review): static
+    {
+        if ($this->reviews->removeElement($review)) {
+            if ($review->getManga() === $this) {
+                $review->setManga(null);
+            }
+        }
         return $this;
     }
 }
