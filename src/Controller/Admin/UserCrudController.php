@@ -49,6 +49,18 @@ class UserCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm(),
             EmailField::new('email'),
+            TextField::new('first_name', 'Prénom')
+                ->setRequired(true),
+            TextField::new('last_name', 'Nom')
+                ->setRequired(true),
+            TextField::new('plainPassword', 'Mot de passe')
+                ->setFormType(PasswordType::class)
+                ->setRequired($pageName === Crud::PAGE_NEW)
+                ->onlyOnForms(),
+            TextField::new('confirmPassword', 'Confirmer le mot de passe')
+                ->setFormType(PasswordType::class)
+                ->setRequired($pageName === Crud::PAGE_NEW)
+                ->onlyOnForms(),
             ChoiceField::new('roles')
                 ->setChoices([
                     'Utilisateur' => 'ROLE_USER',
@@ -78,6 +90,10 @@ class UserCrudController extends AbstractCrudController
             return;
         }
 
+        if ($user->getPlainPassword() !== $user->getConfirmPassword()) {
+            throw new \InvalidArgumentException('Les mots de passe ne correspondent pas');
+        }
+
         $hashedPassword = $this->passwordHasher->hashPassword(
             $user,
             $user->getPlainPassword()
@@ -85,4 +101,4 @@ class UserCrudController extends AbstractCrudController
         
         $user->setPassword($hashedPassword);
     }
-} 
+}

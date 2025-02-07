@@ -44,6 +44,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     private ?string $plainPassword = null;
+    private ?string $confirmPassword = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $resetPasswordToken = null;
@@ -180,6 +181,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPlainPassword(?string $plainPassword): self
     {
         $this->plainPassword = $plainPassword;
+        return $this;
+    }
+
+    public function getConfirmPassword(): ?string
+    {
+        return $this->confirmPassword;
+    }
+
+    public function setConfirmPassword(?string $confirmPassword): self
+    {
+        $this->confirmPassword = $confirmPassword;
         return $this;
     }
 
