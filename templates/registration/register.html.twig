@@ -24,6 +24,24 @@
     <!-- Registration Form -->
     {{ form_start(registrationForm, {'attr': {'class': 'space-y-4'}}) }}
 
+        <!-- First Name Field -->
+        <div>
+            {{ form_row(registrationForm.firstname, {
+                'attr': {'class': 'w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-red-300'},
+                'label_attr': {'class': 'block text-gray-700 font-medium'},
+                'label': 'Prénom'
+            }) }}
+        </div>
+
+        <!-- Last Name Field -->
+        <div>
+            {{ form_row(registrationForm.lastname, {
+                'attr': {'class': 'w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-red-300'},
+                'label_attr': {'class': 'block text-gray-700 font-medium'},
+                'label': 'Nom'
+            }) }}
+        </div>
+
         <!-- Email Field -->
         <div>
             {{ form_row(registrationForm.email, {
@@ -33,22 +51,22 @@
         </div>
 
         <!-- Password Field -->
-<div>
-    {{ form_row(registrationForm.plainPassword.first, {
-        'attr': {'class': 'w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-red-300'},
-        'label_attr': {'class': 'block text-gray-700 font-medium'},
-        'label': 'Mot de passe'
-    }) }}
-</div>
+        <div>
+            {{ form_row(registrationForm.plainPassword.first, {
+                'attr': {'class': 'w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-red-300'},
+                'label_attr': {'class': 'block text-gray-700 font-medium'},
+                'label': 'Mot de passe'
+            }) }}
+        </div>
 
-<!-- Confirm Password Field -->
-<div>
-    {{ form_row(registrationForm.plainPassword.second, {
-        'attr': {'class': 'w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-red-300'},
-        'label_attr': {'class': 'block text-gray-700 font-medium'},
-        'label': 'Confirmez le mot de passe'
-    }) }}
-</div>
+        <!-- Confirm Password Field -->
+        <div>
+            {{ form_row(registrationForm.plainPassword.second, {
+                'attr': {'class': 'w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-red-300'},
+                'label_attr': {'class': 'block text-gray-700 font-medium'},
+                'label': 'Confirmez le mot de passe'
+            }) }}
+        </div>
 
         <!-- Agree Terms -->
         <div>
