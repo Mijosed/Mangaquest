@@ -5,10 +5,10 @@ Bienvenue sur **MangaQuest**, une plateforme permettant aux utilisateurs de déc
 ## ⚙️ Prérequis
 
 Avant d'installer MangaQuest, assurez-vous d'avoir :
-- PHP 8.x
+- PHP 8.3
 - Composer
 - Symfony CLI
-- PostgreSQL
+- MySQL
 
 ## 📥 Installation
 
@@ -83,6 +83,5 @@ MangaQuest utilise une base de données MySQL contenant les entités suivantes :
 
 ---
 
-🎉 **Merci d'utiliser MangaQuest !** 🎉
 
 
