@@ -1,5 +1,3 @@
-# MangaQuest
-
 ![MangaQuest Logo](public/images/logoNavbar.svg)
 
 Bienvenue sur **MangaQuest**, une plateforme permettant aux utilisateurs de découvrir et d'interagir avec des mangas et des animes. 
